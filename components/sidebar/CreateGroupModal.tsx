@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { X, Search, Check, Users, Camera, Loader2, Plus, Sparkles } from "lucide-react";
+import { X, Search, Check, Users, Camera, Loader2, Plus, Sparkles, Image as ImageIcon } from "lucide-react";
 
 interface CreateGroupModalProps {
     isOpen: boolean;
@@ -13,11 +13,16 @@ interface CreateGroupModalProps {
 export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
     const allUsers = useQuery(api.users.getAllUsers);
     const createGroup = useMutation(api.conversations.createGroupConversation);
+    const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
     const [groupName, setGroupName] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     if (!isOpen) return null;
 
@@ -34,20 +39,44 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
         );
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleCreateGroup = async () => {
         if (!groupName || selectedUsers.length === 0) return;
 
         setIsSubmitting(true);
         try {
+            let groupImageStorageId = undefined;
+
+            // Upload image if selected
+            if (selectedImage) {
+                const postUrl = await generateUploadUrl();
+                const result = await fetch(postUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": selectedImage.type },
+                    body: selectedImage,
+                });
+                const { storageId } = await result.json();
+                groupImageStorageId = storageId;
+            }
+
             await createGroup({
                 groupName,
-                memberIds: selectedUsers as any, // Convex IDs are strings at runtime
+                memberIds: selectedUsers as any,
+                groupImageStorageId,
             });
-            onClose();
-            // Reset state
-            setGroupName("");
-            setSelectedUsers([]);
-            setSearchQuery("");
+
+            handleClose();
         } catch (error) {
             console.error("Failed to create group", error);
         } finally {
@@ -55,14 +84,23 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
         }
     };
 
+    const handleClose = () => {
+        setGroupName("");
+        setSelectedUsers([]);
+        setSearchQuery("");
+        setSelectedImage(null);
+        setImagePreview(null);
+        onClose();
+    };
+
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className="bg-[#0b141b] w-full max-w-md border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <div className="bg-[#0b141b] w-full max-w-md border border-zinc-800 rounded-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="relative px-6 py-5 border-b border-zinc-900 bg-zinc-900/50">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                            <div className="w-10 h-10 rounded-md bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
                                 <Users className="w-5 h-5 text-indigo-400" />
                             </div>
                             <div>
@@ -71,7 +109,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                             </div>
                         </div>
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="p-2 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400 hover:text-white"
                         >
                             <X className="w-5 h-5" />
@@ -82,23 +120,41 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                 <div className="p-6 space-y-6">
                     {/* Group Identity */}
                     <div className="flex items-center gap-6">
-                        <div className="relative group flex-shrink-0">
-                            <div className="w-20 h-20 rounded-3xl bg-zinc-900 flex items-center justify-center border-2 border-dashed border-zinc-800 group-hover:border-indigo-500/50 transition-all cursor-pointer overflow-hidden">
-                                <Camera className="w-8 h-8 text-zinc-700 group-hover:text-indigo-400 transition-colors" />
-                                <div className="absolute inset-0 bg-indigo-500/0 group-hover:bg-indigo-500/10 transition-colors" />
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="relative group flex-shrink-0 cursor-pointer"
+                        >
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleImageChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
+
+                            <div className="w-20 h-20 rounded-md bg-zinc-900 flex items-center justify-center border-2 border-dashed border-zinc-800 group-hover:border-indigo-500/50 transition-all overflow-hidden relative">
+                                {imagePreview ? (
+                                    <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
+                                ) : (
+                                    <Camera className="w-8 h-8 text-zinc-700 group-hover:text-indigo-400 transition-colors" />
+                                )}
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <ImageIcon className="w-6 h-6 text-white" />
+                                </div>
                             </div>
                             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-indigo-500 rounded-full border-4 border-[#0b141b] flex items-center justify-center shadow-lg">
                                 <Plus className="w-3 h-3 text-white" />
                             </div>
                         </div>
+
                         <div className="flex-1 space-y-1">
                             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Group Name</label>
                             <input
                                 type="text"
                                 value={groupName}
                                 onChange={(e) => setGroupName(e.target.value)}
-                                placeholder="Team Awesome 🚀"
-                                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                placeholder="Team Awesome"
+                                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md px-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
                             />
                         </div>
                     </div>
@@ -120,12 +176,12 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search friends..."
-                                className="w-full bg-zinc-900/30 border border-zinc-800/50 rounded-2xl pl-10 pr-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/30 focus:bg-zinc-900/50 transition-all"
+                                className="w-full bg-zinc-900/30 border border-zinc-800/50 rounded-md pl-10 pr-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/30 focus:bg-zinc-900/50 transition-all"
                             />
                         </div>
 
                         {/* User List */}
-                        <div className="max-h-[300px] overflow-y-auto space-y-1 pr-2 custom-scrollbar">
+                        <div className="max-h-[250px] overflow-y-auto space-y-1 pr-2 custom-scrollbar">
                             {allUsers === undefined ? (
                                 Array(4).fill(0).map((_, i) => (
                                     <div key={i} className="flex items-center gap-3 p-3 rounded-2xl animate-shimmer">
@@ -142,7 +198,6 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                         <Search className="w-5 h-5 text-zinc-700" />
                                     </div>
                                     <p className="text-sm font-bold text-zinc-500">No friends found</p>
-                                    <p className="text-[10px] text-zinc-700 font-medium">Try searching for someone else</p>
                                 </div>
                             ) : (
                                 filteredUsers?.map((user) => {
@@ -151,9 +206,9 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                         <button
                                             key={user._id}
                                             onClick={() => toggleUser(user._id)}
-                                            className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all group relative ${isSelected
-                                                    ? 'bg-indigo-500/10 border border-indigo-500/20'
-                                                    : 'hover:bg-zinc-900/50 border border-transparent'
+                                            className={`w-full flex items-center gap-3 p-3 rounded-md transition-all group relative ${isSelected
+                                                ? 'bg-indigo-500/10 border border-indigo-500/20'
+                                                : 'hover:bg-zinc-900/50 border border-transparent'
                                                 }`}
                                         >
                                             <div className="relative">
@@ -172,12 +227,6 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                                     {user.email}
                                                 </p>
                                             </div>
-                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSelected
-                                                    ? 'bg-indigo-500 border-indigo-500 scale-110'
-                                                    : 'border-zinc-800 group-hover:border-zinc-700'
-                                                }`}>
-                                                {isSelected && <Check className="w-3 h-3 text-white stroke-[4]" />}
-                                            </div>
                                         </button>
                                     );
                                 })
@@ -191,9 +240,9 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                     <button
                         onClick={handleCreateGroup}
                         disabled={!groupName || selectedUsers.length === 0 || isSubmitting}
-                        className={`w-full py-4 rounded-2xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 group shadow-xl ${!groupName || selectedUsers.length === 0 || isSubmitting
-                                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50'
-                                : 'bg-white text-black hover:scale-[1.02] active:scale-[0.98]'
+                        className={`w-full py-4 rounded-md font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 group ${!groupName || selectedUsers.length === 0 || isSubmitting
+                            ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50'
+                            : 'bg-white text-black hover:bg-white/90'
                             }`}
                     >
                         {isSubmitting ? (

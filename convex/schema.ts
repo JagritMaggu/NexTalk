@@ -19,8 +19,11 @@ export default defineSchema({
         participantIds: v.array(v.id("users")),  // all members of this conversation
         isGroup: v.boolean(),                    // false = DM, true = group
         groupName: v.optional(v.string()),       // Feature 14: group name
-        groupImage: v.optional(v.string()),      // Feature 14: group avatar
+        groupImage: v.optional(v.string()),      // Feature 14: group avatar (URL or placeholder)
+        groupImageStorageId: v.optional(v.id("_storage")),
         lastMessageId: v.optional(v.id("messages")), // for sidebar preview (Feature 3)
+        ownerId: v.optional(v.id("users")),          // Feature: Group Owner
+        isDeleted: v.optional(v.boolean()),          // Feature: Group deletion support
     })
         .index("by_lastMessageId", ["lastMessageId"]),
 
@@ -31,6 +34,9 @@ export default defineSchema({
         senderId: v.id("users"),
         content: v.string(),
         isDeleted: v.boolean(),         // Feature 11: soft delete
+        fileStorageId: v.optional(v.id("_storage")),
+        fileUrl: v.optional(v.string()),
+        fileType: v.optional(v.string()), // 'image', 'file', etc.
     })
         .index("by_conversationId", ["conversationId"]),
 
@@ -60,6 +66,7 @@ export default defineSchema({
         conversationId: v.id("conversations"),
         userId: v.id("users"),
         lastSeenMessageId: v.optional(v.id("messages")), // for unread count (Feature 9)
+        role: v.optional(v.string()),                  // "owner" | "admin" | "member"
     })
         .index("by_conversationId", ["conversationId"])
         .index("by_userId", ["userId"])

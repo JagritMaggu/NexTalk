@@ -1,7 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation } from "./_generated/server";
 
-const ALLOWED_EMOJIS = ["👍", "❤️", "😂", "😮", "😢"];
+const ALLOWED_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🚀", "💯", "✅", "🙌", "🎉", "🤝"];
 
 // Toggle a reaction on a message (Feature 12)
 export const toggleReaction = mutation({

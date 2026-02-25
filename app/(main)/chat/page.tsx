@@ -25,7 +25,7 @@ const ChatPage = memo(function ChatPage() {
             {/* Chat Area — Inspired by the sliding mobile panels */}
             <div
                 className={`${selectedConversationId ? "flex" : "hidden md:flex"
-                    } flex-1 min-w-0 h-full animate-slide-up bg-white shadow-2xl z-20`}
+                    } flex-1 min-w-0 h-full animate-slide-up bg-[#0b141b] md:bg-white shadow-2xl z-[100]`}
             >
                 <ChatArea
                     conversationId={selectedConversationId}

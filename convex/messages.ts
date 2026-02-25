@@ -6,8 +6,10 @@ export const sendMessage = mutation({
     args: {
         conversationId: v.id("conversations"),
         content: v.string(),
+        fileStorageId: v.optional(v.id("_storage")),
+        fileType: v.optional(v.string()),
     },
-    handler: async (ctx, { conversationId, content }) => {
+    handler: async (ctx, { conversationId, content, fileStorageId, fileType }) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Unauthorized");
 
@@ -24,12 +26,18 @@ export const sendMessage = mutation({
             throw new Error("Not a participant in this conversation");
         }
 
+        if (conversation.isDeleted) {
+            throw new Error("This group no longer exists");
+        }
+
         // Insert the message
         const messageId = await ctx.db.insert("messages", {
             conversationId,
             senderId: currentUser._id,
             content: content.trim(),
             isDeleted: false,
+            fileStorageId,
+            fileType,
         });
 
         // Update conversation's lastMessageId for sidebar preview
@@ -104,11 +112,18 @@ export const getMessages = query({
                     .filter((r) => r.userId === currentUser._id)
                     .map((r) => r.emoji);
 
+                // Get file URL if there's an attachment
+                let fileUrl = null;
+                if (message.fileStorageId) {
+                    fileUrl = await ctx.storage.getUrl(message.fileStorageId);
+                }
+
                 return {
                     ...message,
                     sender,
                     reactionCounts,
                     myReactions,
+                    fileUrl,
                     isMe: message.senderId === currentUser._id,
                 };
             })
@@ -183,5 +198,45 @@ export const markConversationAsRead = mutation({
                 lastSeenMessageId: latestMessage._id,
             });
         }
+    },
+});
+
+export const getMediaCount = query({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
+        const messages = await ctx.db
+            .query("messages")
+            .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
+            .filter((q) => q.neq(q.field("fileStorageId"), undefined))
+            .filter((q) => q.neq(q.field("isDeleted"), true))
+            .collect();
+
+        return messages.length;
+    },
+});
+
+export const getSharedMedia = query({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
+        const messages = await ctx.db
+            .query("messages")
+            .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
+            .filter((q) => q.neq(q.field("fileStorageId"), undefined))
+            .filter((q) => q.neq(q.field("isDeleted"), true))
+            .order("desc")
+            .collect();
+
+        return await Promise.all(
+            messages.map(async (msg) => {
+                const url = msg.fileStorageId ? await ctx.storage.getUrl(msg.fileStorageId) : null;
+                return {
+                    _id: msg._id,
+                    _creationTime: msg._creationTime,
+                    url,
+                    fileType: msg.fileType,
+                    content: msg.content,
+                };
+            })
+        );
     },
 });
