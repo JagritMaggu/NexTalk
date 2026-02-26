@@ -33,7 +33,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
     return (
         <div
             onClick={onClick}
-            className={`flex items-center gap-4 w-full p-4 rounded-3xl md:rounded-none transition-all cursor-pointer ${isSelected
+            className={`flex items-center gap-3 w-full p-3.5 rounded-3xl md:rounded-none transition-all cursor-pointer ${isSelected
                 ? 'bg-zinc-50 md:bg-white/5'
                 : 'hover:bg-zinc-50/50 md:hover:bg-white/[0.02]'
                 }`}
@@ -46,7 +46,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                             onPreviewImage(displayImage);
                         }
                     }}
-                    className={`w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden shadow-sm border md:border-2 border-zinc-100 md:border-white/10 ring-1 ring-black/5 md:ring-white/5 transition-all group-hover:shadow-md ${displayImage ? 'cursor-pointer' : ''}`}
+                    className={`w-10 h-10 md:w-11 md:h-11 rounded-full overflow-hidden shadow-sm border md:border-2 border-zinc-100 md:border-white/10 ring-1 ring-black/5 md:ring-white/5 transition-all group-hover:shadow-md ${displayImage ? 'cursor-pointer' : ''}`}
                 >
                     {displayImage ? (
                         <img
@@ -56,15 +56,15 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                         />
                     ) : (
                         <div className={`w-full h-full flex items-center justify-center text-white ${isGroup ? 'bg-indigo-500' : 'bg-gradient-to-br from-zinc-700 to-zinc-900 font-bold'}`}>
-                            {isGroup ? <Users className="w-6 h-6" /> : <span>{displayName?.charAt(0) || "U"}</span>}
+                            {isGroup ? <Users className="w-5 h-5" /> : <span className="text-xs">{displayName?.charAt(0) || "U"}</span>}
                         </div>
                     )}
                 </div>
                 {isOnline && <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white md:border-[#0b141b] shadow-sm" />}
             </div>
             <div className="flex-1 text-left min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                    <span className={`truncate text-sm md:text-base ${conv.unreadCount > 0 ? 'font-black text-indigo-400' : 'font-bold text-black md:text-white'}`}>
+                <div className="flex items-center justify-between mb-0.5">
+                    <span className={`truncate text-xs md:text-sm ${conv.unreadCount > 0 ? 'font-black text-indigo-400' : 'font-bold text-black md:text-white'}`}>
                         {displayName}
                     </span>
                     <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                 e.stopPropagation();
                                 onToggleArchive();
                             }}
-                            className={`hidden md:flex p-1.5 rounded-full transition-all 
+                            className={`flex p-1.5 rounded-full transition-all 
                                     ${isArchived
                                     ? 'text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20'
                                     : 'text-zinc-400 hover:text-indigo-400 hover:bg-indigo-500/5'}
@@ -87,7 +87,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                 e.stopPropagation();
                                 onToggleStar();
                             }}
-                            className={`hidden md:block p-1 rounded-full transition-all ${isStarred ? 'text-accent-star scale-125' : 'text-zinc-500 hover:text-zinc-400'}`}
+                            className={`p-1 rounded-full transition-all ${isStarred ? 'text-accent-star' : 'text-zinc-500 hover:text-zinc-400'}`}
                         >
                             <Star className={`w-4 h-4 ${isStarred ? 'fill-current' : ''}`} />
                         </button>
@@ -96,8 +96,8 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                         </span>
                     </div>
                 </div>
-                <div className="flex items-center justify-between gap-4">
-                    <p className={`text-xs truncate flex-1 ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
+                <div className="flex items-center justify-between gap-3">
+                    <p className={`text-[11px] truncate flex-1 ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
                         {conv.lastMessage?.content || "Tap to chat"}
                     </p>
                     {conv.unreadCount > 0 && (
@@ -112,7 +112,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
 };
 
 const PeopleItem = ({ user, onClick, onPreviewImage }: any) => (
-    <div onClick={onClick} className="flex items-center gap-4 w-full p-4 hover:bg-zinc-50 md:hover:bg-white/[0.02] rounded-3xl md:rounded-none transition-all cursor-pointer">
+    <div onClick={onClick} className="flex items-center gap-3 w-full p-3.5 hover:bg-zinc-50 md:hover:bg-white/[0.02] rounded-3xl md:rounded-none transition-all cursor-pointer">
         <div className="relative group">
             <div
                 onClick={(e) => {
@@ -121,21 +121,21 @@ const PeopleItem = ({ user, onClick, onPreviewImage }: any) => (
                         onPreviewImage(user.image);
                     }
                 }}
-                className={`w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden shadow-sm border md:border-2 border-zinc-100 md:border-white/10 ${user.image ? 'cursor-pointer transition-all' : ''}`}
+                className={`w-10 h-10 md:w-11 md:h-11 rounded-full overflow-hidden shadow-sm border md:border-2 border-zinc-100 md:border-white/10 ${user.image ? 'cursor-pointer transition-all' : ''}`}
             >
                 {user.image ? (
                     <img src={user.image} className="w-full h-full object-cover" alt="" />
                 ) : (
                     <div className="w-full h-full bg-zinc-100 md:bg-white/5 flex items-center justify-center text-zinc-400 md:text-zinc-500 font-bold">
-                        {user.name?.charAt(0) || "U"}
+                        <span className="text-xs">{user.name?.charAt(0) || "U"}</span>
                     </div>
                 )}
             </div>
             {user.isOnline && <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white md:border-[#0b141b] shadow-sm" />}
         </div>
         <div className="flex-1 text-left">
-            <p className="font-bold text-black md:text-white text-sm md:text-base">{user.name}</p>
-            <p className={`text-[9px] font-black uppercase tracking-widest ${user.isOnline ? 'text-green-500' : 'text-zinc-300 md:text-zinc-600'}`}>
+            <p className="font-bold text-black md:text-white text-xs md:text-sm">{user.name}</p>
+            <p className={`text-[8px] font-black uppercase tracking-widest ${user.isOnline ? 'text-green-500' : 'text-zinc-300 md:text-zinc-600'}`}>
                 {user.isOnline ? 'Online' : 'Offline'}
             </p>
         </div>
@@ -309,123 +309,44 @@ export const Sidebar = memo(function Sidebar({
 
     return (
         <div className="flex flex-col h-full w-full bg-[#0b141b] md:bg-[#0b141b] text-white overflow-hidden">
-            {/* ─── DESKTOP HEADER (Matches Inspiration) ─── */}
-            <div className="hidden md:flex p-6 items-center justify-between border-b border-white/5">
-                <div className="flex-1 flex items-center gap-4">
+            {/* ─── DESKTOP HEADER (Restored & Taller) ─── */}
+            <div className="hidden md:flex h-20 px-6 items-center justify-between border-b border-white/5 bg-black/5">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={() => setActiveTab(activeTab === 'chats' ? 'people' : 'chats')}
                         className={`transition-colors flex-shrink-0 ${activeTab === 'people' ? 'text-white' : 'text-zinc-500 hover:text-white'}`}
                         title="Toggle People/Chats"
                     >
-                        <Users className="w-6 h-6" />
+                        <Users className="w-5 h-5" />
                     </button>
-                    <div className="relative flex-1">
-                        <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-transparent pl-7 text-sm font-medium focus:outline-none w-full transition-all placeholder:text-zinc-700"
-                        />
+                    <div>
+                        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">ChatApp</p>
+                        <h1 className="text-sm font-black text-white">{activeTab === 'chats' ? 'Conversations' : 'All Members'}</h1>
                     </div>
                 </div>
-                <UserButton
-                    appearance={{
-                        elements: {
-                            userButtonAvatarBox: "h-8 w-8 border border-white/10",
-                        }
-                    }}
-                />
+                <UserButton appearance={{ elements: { userButtonAvatarBox: "h-8 w-8 border border-white/10" } }} />
             </div>
 
-            {/* ─── DESKTOP FILTERS (Sleek Dropdowns) ─── */}
-            <div className="hidden md:flex px-6 py-4 items-center justify-between text-xs font-bold text-zinc-500 uppercase tracking-widest relative">
-                <div className="relative">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenDropdown(openDropdown === "time" ? null : "time");
-                        }}
-                        className={`flex items-center gap-2 cursor-pointer transition-colors px-4 py-2 rounded-full hover:bg-white/10 ${openDropdown === 'time' ? 'bg-white/10 text-white' : 'bg-white/5 text-zinc-500'}`}
-                    >
-                        <span className="text-[11px]">{timeRange}</span> <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'time' ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {openDropdown === "time" && (
-                        <div
-                            className="absolute top-full left-0 mt-2 w-40 bg-[#1e2329] border border-white/5 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {(["All", "Today", "Yesterday"] as const).map((r) => (
-                                <button
-                                    key={r}
-                                    onClick={() => {
-                                        setTimeRange(r);
-                                        setOpenDropdown(null);
-                                    }}
-                                    className={`w-full text-left px-5 py-3 text-sm font-bold transition-all hover:bg-white/5 ${timeRange === r ? 'text-indigo-400' : 'text-zinc-400 hover:text-zinc-200'}`}
-                                >
-                                    {r}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <div className="relative">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenDropdown(openDropdown === "sort" ? null : "sort");
-                        }}
-                        className={`flex items-center gap-2 cursor-pointer transition-colors px-4 py-2 rounded-full hover:bg-white/10 ${openDropdown === 'sort' ? 'bg-white/10 text-white' : 'bg-white/5 text-zinc-500'}`}
-                    >
-                        <span className="text-[11px]">{sortOrder === "Newest" ? "Date (New)" : "Date (Old)"}</span> <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'sort' ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {openDropdown === "sort" && (
-                        <div
-                            className="absolute top-full right-0 mt-2 w-44 bg-[#1e2329] border border-white/5 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <button
-                                onClick={() => { setSortOrder("Newest"); setOpenDropdown(null); }}
-                                className={`w-full text-left px-5 py-3 text-sm font-bold transition-all hover:bg-white/5 ${sortOrder === "Newest" ? 'text-indigo-400' : 'text-zinc-400 hover:text-zinc-200'}`}
-                            >
-                                Newest First
-                            </button>
-                            <button
-                                onClick={() => { setSortOrder("Oldest"); setOpenDropdown(null); }}
-                                className={`w-full text-left px-5 py-3 text-sm font-bold transition-all hover:bg-white/5 ${sortOrder === "Oldest" ? 'text-indigo-400' : 'text-zinc-400 hover:text-zinc-200'}`}
-                            >
-                                Oldest First
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* ─── MOBILE HEADER (Chatdong Style kept) ─── */}
-            <div className="flex md:hidden px-6 pt-12 pb-8 flex-col">
+            {/* ─── MOBILE HEADER (Dark Section Restored) ─── */}
+            <div className="flex md:hidden px-6 pt-12 pb-8 flex-col bg-[#0b141b] text-white">
                 <div className="flex items-center justify-between mb-2">
                     <div>
-                        <p className="text-zinc-500 text-xs font-medium uppercase tracking-widest">ChatApp</p>
-                        <h1 className="text-2xl font-black mt-0.5 tracking-tight">
+                        <p className="text-zinc-500 text-[10px] font-medium uppercase tracking-widest">ChatApp</p>
+                        <h1 className="text-xl font-black mt-0.5 tracking-tight">
                             {activeTab === 'chats' ? 'Chats' : 'Members'}
                         </h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsGroupModalOpen(true)}
-                            className="w-10 h-10 bg-zinc-900 rounded-2xl flex items-center justify-center border border-zinc-800"
+                            className="w-9 h-9 bg-zinc-900 rounded-xl flex items-center justify-center border border-zinc-800"
                         >
-                            <UserPlus className="w-5 h-5 text-zinc-400" />
+                            <UserPlus className="w-4.5 h-4.5 text-zinc-400" />
                         </button>
                         <UserButton
                             appearance={{
                                 elements: {
-                                    userButtonAvatarBox: "h-10 w-10 border border-white/20",
+                                    userButtonAvatarBox: "h-9 w-9 border border-white/20",
                                 }
                             }}
                         />
@@ -433,32 +354,6 @@ export const Sidebar = memo(function Sidebar({
                 </div>
             </div>
 
-            {/* ─── FOLDER NAVIGATION (New) ─── */}
-            <div className="hidden md:flex flex-col px-6 pb-4 border-b border-white/5 bg-black/10">
-                <div className="flex items-center gap-1 bg-white/5 rounded-md p-1.5 mt-2">
-                    <button
-                        onClick={() => setViewMode("all")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md transition-all ${viewMode === 'all' ? 'bg-white/10 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
-                    >
-                        <Inbox className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-wider">All</span>
-                    </button>
-                    <button
-                        onClick={() => setViewMode("favorites")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md transition-all ${viewMode === 'favorites' ? 'bg-accent-star/10 text-accent-star shadow-lg shadow-accent-star/5' : 'text-zinc-500 hover:text-zinc-300'}`}
-                    >
-                        <Star className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-wider">Favourites</span>
-                    </button>
-                    <button
-                        onClick={() => setViewMode("archived")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md transition-all ${viewMode === 'archived' ? 'bg-indigo-500/10 text-indigo-400 shadow-lg shadow-indigo-500/5' : 'text-zinc-500 hover:text-zinc-300'}`}
-                    >
-                        <Archive className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-wider">Archived</span>
-                    </button>
-                </div>
-            </div>
 
             <CreateGroupModal
                 isOpen={isGroupModalOpen}
@@ -467,18 +362,98 @@ export const Sidebar = memo(function Sidebar({
 
             {/* ─── MAIN LIST AREA ─── */}
             <div className="flex-1 bg-white md:bg-transparent md:text-white rounded-t-[40px] md:rounded-none flex flex-col overflow-hidden relative">
-                {/* Mobile Search Input */}
-                <div className="md:hidden px-8 pt-8 pb-4">
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-zinc-100 rounded-full px-6 py-3.5 text-sm font-medium text-black placeholder:text-zinc-400 focus:ring-2 focus:ring-black/5 outline-none"
-                    />
+
+                {/* Filters, Search & Tabs */}
+                <div className="px-6 pt-8 pb-4 space-y-4">
+                    {/* Filters Row (Top level) */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === "time" ? null : "time"); }}
+                                    className={`flex items-center gap-2 transition-colors px-3 py-1.5 rounded-md ${openDropdown === 'time' ? 'bg-zinc-100 md:bg-white/10 text-black md:text-white' : 'bg-zinc-50 md:bg-white/5 text-zinc-400 md:text-zinc-500'}`}
+                                >
+                                    <span className="text-[10px] font-black uppercase tracking-wider">{timeRange}</span>
+                                    <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === 'time' ? 'rotate-180' : ''}`} />
+                                </button>
+                                {openDropdown === "time" && (
+                                    <div className="absolute top-full left-0 mt-2 w-32 bg-white md:bg-[#1e2329] border border-zinc-100 md:border-white/5 rounded-md shadow-2xl py-1 z-50">
+                                        {(["All", "Today", "Yesterday"] as const).map((r) => (
+                                            <button
+                                                key={r}
+                                                onClick={() => { setTimeRange(r); setOpenDropdown(null); }}
+                                                className={`w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:bg-zinc-50 md:hover:bg-white/5 ${timeRange === r ? 'text-indigo-500 md:text-indigo-400' : 'text-zinc-400'}`}
+                                            >
+                                                {r}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === "sort" ? null : "sort"); }}
+                                    className={`flex items-center gap-2 transition-colors px-3 py-1.5 rounded-md ${openDropdown === 'sort' ? 'bg-zinc-100 md:bg-white/10 text-black md:text-white' : 'bg-zinc-50 md:bg-white/5 text-zinc-400 md:text-zinc-500'}`}
+                                >
+                                    <span className="text-[10px] font-black uppercase tracking-wider">{sortOrder === "Newest" ? "New" : "Old"}</span>
+                                    <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === 'sort' ? 'rotate-180' : ''}`} />
+                                </button>
+                                {openDropdown === "sort" && (
+                                    <div className="absolute top-full left-0 mt-2 w-36 bg-white md:bg-[#1e2329] border border-zinc-100 md:border-white/5 rounded-md shadow-2xl py-1 z-50">
+                                        <button onClick={() => { setSortOrder("Newest"); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider text-zinc-400 hover:bg-zinc-50 md:hover:bg-white/5">Newest First</button>
+                                        <button onClick={() => { setSortOrder("Oldest"); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider text-zinc-400 hover:bg-zinc-50 md:hover:bg-white/5">Oldest First</button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Folder Switchers (Unified 4-tab Nav) */}
+                        <div className="flex items-center gap-1 bg-zinc-50 md:bg-white/5 p-1 rounded-md">
+                            <button
+                                onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'bg-white md:bg-white/10 text-indigo-500 md:text-white shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-zinc-200'}`}
+                                title="All Chats"
+                            >
+                                <Inbox className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("people")}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'people' ? 'bg-white md:bg-white/10 text-indigo-500 md:text-white shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-zinc-200'}`}
+                                title="People"
+                            >
+                                <Users className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => { setActiveTab("chats"); setViewMode("favorites"); }}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'favorites' ? 'bg-accent-star/10 text-accent-star' : 'text-zinc-400 hover:text-accent-star'}`}
+                                title="Favorites"
+                            >
+                                <Star className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => { setActiveTab("chats"); setViewMode("archived"); }}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'archived' ? 'bg-indigo-500/10 text-indigo-500 md:text-indigo-400' : 'text-zinc-400 hover:text-indigo-400'}`}
+                                title="Archived"
+                            >
+                                <Archive className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Unified Search Bar */}
+                    <div className="relative flex items-center bg-zinc-50 md:bg-black/10 rounded-xl h-12 px-5 group focus-within:bg-zinc-100 md:focus-within:bg-black/20 transition-all border border-transparent focus-within:border-zinc-200 md:focus-within:border-white/5">
+                        <Search className="w-4 h-4 text-zinc-300 md:text-zinc-700 group-focus-within:text-indigo-500 transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Search chats..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-transparent ml-3 text-sm font-bold focus:outline-none w-full placeholder:text-zinc-300 md:placeholder:text-zinc-800 text-black md:text-white"
+                        />
+                    </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-4 no-scrollbar pb-32">
+                <div className="flex-1 overflow-y-auto px-2.5 md:px-2.5 no-scrollbar pb-32">
                     {activeTab === 'chats' ? (
                         <div className="flex flex-col gap-0 md:gap-1 mt-4 md:mt-0">
                             {conversations === undefined ? (
@@ -530,28 +505,42 @@ export const Sidebar = memo(function Sidebar({
                 {/* WhatsApp-style Sticky Plus Button */}
                 <button
                     onClick={() => setIsGroupModalOpen(true)}
-                    className="absolute bottom-28 md:bottom-10 right-8 w-12 h-12 bg-indigo-500 hover:opacity-80 text-white rounded-md hidden md:flex items-center justify-center z-[60] group border border-white/10 transition-opacity duration-300"
+                    className="absolute bottom-28 md:bottom-10 right-8 w-8 h-8 bg-[#FEF9C3] hover:opacity-90 text-[#111827] rounded-md hidden md:flex items-center justify-center z-[60] group shadow-xl transition-all active:scale-95"
                     title="New Group"
                 >
-                    <Plus className="w-6 h-6" />
+                    <Plus className="w-4 h-4" strokeWidth={3} />
                 </button>
 
                 {/* Mobile Navigation */}
                 <div className="absolute bottom-10 left-0 w-full px-8 pointer-events-none md:hidden">
-                    <div className="bg-black py-4 px-12 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto">
+                    <div className="bg-black py-4 px-8 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto border border-white/10">
                         <button
-                            onClick={() => setActiveTab("chats")}
-                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                            onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'text-white' : 'text-zinc-600'}`}
                         >
-                            <MessageCircle className="w-5 h-5" />
-                            <span className="text-[9px] font-bold">Chats</span>
+                            <Inbox className="w-4.5 h-4.5" />
+                            <span className="text-[8px] font-bold">All</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("people")}
-                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'people' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'people' ? 'text-white' : 'text-zinc-600'}`}
                         >
-                            <Users className="w-5 h-5" />
-                            <span className="text-[9px] font-bold">People</span>
+                            <Users className="w-4.5 h-4.5" />
+                            <span className="text-[8px] font-bold">People</span>
+                        </button>
+                        <button
+                            onClick={() => { setActiveTab("chats"); setViewMode("favorites"); }}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'favorites' ? 'text-accent-star' : 'text-zinc-600'}`}
+                        >
+                            <Star className="w-4.5 h-4.5" />
+                            <span className="text-[8px] font-bold">Starred</span>
+                        </button>
+                        <button
+                            onClick={() => { setActiveTab("chats"); setViewMode("archived"); }}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'archived' ? 'text-indigo-400' : 'text-zinc-600'}`}
+                        >
+                            <Archive className="w-4.5 h-4.5" />
+                            <span className="text-[8px] font-bold">Archive</span>
                         </button>
                     </div>
                 </div>

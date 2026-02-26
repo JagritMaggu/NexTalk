@@ -68,6 +68,10 @@ body {
   }
 }
 
+.cl-userButtonPopoverActionButtonText__signOut {
+  color: #ef4444 !important;
+}
+
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -47,7 +47,7 @@ const ActiveChat = memo(function ActiveChat({
 }) {
     const [content, setContent] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [previewAsset, setPreviewAsset] = useState<string | null>(null);
+    const [previewAsset, setPreviewAsset] = useState<{ url: string; showDownload: boolean } | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [showNewMessageButton, setShowNewMessageButton] = useState(false);
     const [activeReactionMessageId, setActiveReactionMessageId] = useState<Id<"messages"> | null>(null);
@@ -227,82 +227,104 @@ const ActiveChat = memo(function ActiveChat({
 
     return (
         <div className="flex flex-col h-full w-full bg-[#0b141b] md:bg-[#fcfdfe] relative overflow-hidden">
-            {/* ─── HEADER ─── */}
-            <div className="px-6 md:px-10 h-20 md:h-24 flex items-center justify-between border-b border-white/5 md:border-zinc-100 bg-transparent md:bg-white/80 md:backdrop-blur-md sticky top-0 z-20">
-                <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="md:hidden p-2 -ml-2 hover:bg-white/5 rounded-full transition-colors text-white md:text-black">
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <div className="relative group">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden transition-all bg-transparent">
-                            {displayImage ? (
-                                <img src={displayImage} className="w-full h-full object-cover" alt="" />
-                            ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white">
-                                    <span className="text-sm font-bold uppercase">{displayName?.charAt(0) || "U"}</span>
+            {/* ─── HEADER (Optimized with Memo & Shimmer) ─── */}
+            <div className="px-6 md:px-10 h-20 flex items-center justify-between border-b border-white/5 bg-[#0b141b] sticky top-0 z-20">
+                {useMemo(() => {
+                    if (conversation === undefined) {
+                        return (
+                            <div className="flex items-center gap-4">
+                                <button onClick={onBack} className="md:hidden p-2 -ml-2 text-white/20">
+                                    <ChevronLeft className="w-6 h-6" />
+                                </button>
+                                <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/5 animate-shimmer" />
+                                <div className="space-y-2">
+                                    <div className="w-32 h-4 bg-white/5 rounded-md animate-shimmer" />
+                                    <div className="w-20 h-2.5 bg-white/5 rounded-md animate-shimmer opacity-50" />
                                 </div>
-                            )}
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div className="flex items-center gap-4">
+                            <button onClick={onBack} className="md:hidden p-2 -ml-2 hover:bg-white/5 rounded-full transition-colors text-white md:text-black">
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <div className="relative group">
+                                <div
+                                    onClick={() => displayImage && setPreviewAsset({ url: displayImage, showDownload: false })}
+                                    className={`w-10 h-10 md:w-11 md:h-11 rounded-full overflow-hidden transition-all bg-transparent ${displayImage ? 'cursor-pointer' : ''}`}
+                                >
+                                    {displayImage ? (
+                                        <img src={displayImage} className="w-full h-full object-cover" alt="" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white">
+                                            <span className="text-sm font-bold uppercase">{displayName?.charAt(0) || "U"}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                {isOnline && (
+                                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-white text-sm md:text-base leading-tight tracking-tight">
+                                    {displayName || (isGroup ? "Group Chat" : "Loading...")}
+                                </h3>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                    {typingUsers && typingUsers.length > 0 ? (
+                                        <span className="text-[10px] font-bold text-indigo-500 flex items-center gap-1">
+                                            <span className="flex gap-0.5">
+                                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
+                                            </span>
+                                            typing...
+                                        </span>
+                                    ) : (
+                                        <span className={`text-[9px] font-bold uppercase tracking-widest ${isOnline ? 'text-green-500' : 'text-zinc-400'}`}>
+                                            {isGroup ? `${conversation?.participantIds?.length} members` : (isOnline ? 'Online' : 'Offline')}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                        {isOnline && (
-                            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-sm" />
-                        )}
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-white md:text-black text-sm md:text-base leading-tight tracking-tight">
-                            {displayName || (isGroup ? "Group Chat" : "Loading...")}
-                        </h3>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            {typingUsers && typingUsers.length > 0 ? (
-                                <span className="text-[10px] font-bold text-indigo-500 flex items-center gap-1">
-                                    <span className="flex gap-0.5">
-                                        <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                        <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                        <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
-                                    </span>
-                                    typing...
-                                </span>
-                            ) : (
-                                <span className={`text-[9px] font-bold uppercase tracking-widest ${isOnline ? 'text-green-500' : 'text-zinc-400'}`}>
-                                    {isGroup ? `${conversation?.participantIds?.length} members` : (isOnline ? 'Online' : 'Offline')}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                    );
+                }, [conversation, displayName, displayImage, isOnline, typingUsers, onBack])}
 
                 <div className="flex items-center gap-3">
                     {isSearching ? (
-                        <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-2xl border border-zinc-100 animate-in fade-in slide-in-from-right-4">
-                            <Search className="w-4 h-4 text-zinc-400" />
+                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 animate-in fade-in slide-in-from-right-4">
+                            <Search className="w-3.5 h-3.5 text-zinc-500" />
                             <input
                                 autoFocus
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search messages..."
-                                className="bg-transparent border-none outline-none text-sm font-bold text-zinc-800 w-32 md:w-48 placeholder:text-zinc-300"
+                                className="bg-transparent border-none outline-none text-xs font-medium text-white w-32 md:w-48 placeholder:text-zinc-600"
                                 onKeyDown={(e) => e.key === 'Escape' && setIsSearching(false)}
                             />
-                            <button onClick={() => { setIsSearching(false); setSearchQuery(""); }} className="p-1 hover:bg-zinc-100 rounded-full transition-colors text-zinc-400">
-                                <X className="w-4 h-4" />
+                            <button onClick={() => { setIsSearching(false); setSearchQuery(""); }} className="p-1 hover:bg-white/10 rounded-md transition-colors text-zinc-500 hover:text-white">
+                                <X className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     ) : (
                         <button
                             onClick={() => setIsSearching(true)}
-                            className="p-3 hover:bg-zinc-50 rounded-2xl transition-all text-zinc-400 hover:text-indigo-500 hidden md:flex"
+                            className="p-2 transition-all text-zinc-500 hover:text-white hidden md:flex"
                         >
-                            <Search className="w-5 h-5" />
+                            <Search className="w-5 h-5 transition-colors" />
                         </button>
                     )}
 
                     {isGroup && (
                         <button
                             onClick={() => setIsSettingsOpen(true)}
-                            className="p-3 bg-zinc-50 hover:bg-zinc-100 rounded-2xl transition-all text-zinc-800 flex items-center justify-center group/btn"
+                            className="p-2 transition-all text-zinc-500 hover:text-white flex items-center justify-center group/btn"
                             title="Group Settings"
                         >
-                            <Info className="w-5 h-5 text-indigo-500 transition-transform" />
+                            <Info className="w-5 h-5 transition-colors" />
                         </button>
                     )}
                 </div>
@@ -318,185 +340,58 @@ const ActiveChat = memo(function ActiveChat({
                     {showNewMessageButton && (
                         <button
                             onClick={scrollToBottom}
-                            className="fixed bottom-32 right-10 z-30 bg-white border border-zinc-100 p-4 rounded-md flex items-center justify-center hover:bg-zinc-50 transition-all active:scale-95 text-indigo-500"
+                            className="fixed bottom-32 right-10 z-30 bg-zinc-100 border border-zinc-200 p-2 rounded-lg flex items-center justify-center transition-all active:scale-95 text-black hover:text-zinc-500 shadow-xl"
                         >
-                            <ArrowDown className="w-5 h-5" strokeWidth={3} />
+                            <ArrowDown className="w-4 h-4" strokeWidth={3} />
                         </button>
                     )}
 
                     <div className="flex flex-col gap-10">
-                        {messages === undefined ? (
-                            Array(6).fill(0).map((_, i) => <MessageSkeleton key={i} isMe={i % 2 === 0} isGroup={!!isGroup} />)
-                        ) : filteredMessages?.filter(msg => !hiddenMessageIds.has(msg._id)).map((msg, idx) => (
-                            <div key={msg._id} className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative`}>
-                                {(!msg.isMe && isGroup) && (
-                                    <div className="flex-shrink-0 mb-1">
-                                        <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-zinc-100">
-                                            {msg.sender?.image ? (
-                                                <img src={msg.sender?.image} className="w-full h-full object-cover" alt="" />
-                                            ) : (
-                                                <div className="w-full h-full bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-400">
-                                                    {msg.sender?.name?.charAt(0) || "U"}
-                                                </div>
-                                            )}
+                        {useMemo(() => {
+                            if (messages === undefined) {
+                                return Array(6).fill(0).map((_, i) => <MessageSkeleton key={i} isMe={i % 2 === 0} isGroup={!!isGroup} />);
+                            }
+
+                            if (messages.length === 0) {
+                                return (
+                                    <div className="flex flex-col items-center justify-center py-20 animate-in fade-in zoom-in-95 duration-500">
+                                        <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mb-4">
+                                            <MessageCircle className="w-8 h-8 text-zinc-200" />
                                         </div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Start a conversation</p>
                                     </div>
-                                )}
+                                );
+                            }
 
-                                <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
-                                    <div className={`relative px-6 py-4 text-[14px] md:text-[16px] font-medium leading-normal ${msg.isMe
-                                        ? 'bg-[#F3F4F6] text-[#111827] rounded-[24px] rounded-tr-[8px]'
-                                        : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
-                                        } ${msg.isDeleted ? 'opacity-40 italic !bg-zinc-100 !text-zinc-400' : ''} transition-all`}>
-
-                                        {msg.isDeleted ? (
-                                            <div className="flex items-center gap-2">
-                                                <Trash2 className="w-3 h-3" />
-                                                <span>Message deleted</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col gap-3">
-                                                {msg.fileUrl && (
-                                                    <div className="mb-1">
-                                                        {msg.fileType === 'image' ? (
-                                                            <div className="block overflow-hidden rounded-md">
-                                                                <div
-                                                                    className="relative cursor-zoom-in group/img"
-                                                                    onClick={() => msg.fileUrl && setPreviewAsset(msg.fileUrl)}
-                                                                >
-                                                                    <img
-                                                                        src={msg.fileUrl}
-                                                                        className="max-w-full max-h-60 rounded-md object-contain transition-opacity duration-300 group-hover/img:opacity-90"
-                                                                        alt="Attachment"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div
-                                                                className={`flex items-center gap-3 p-3 rounded-md border ${msg.isMe ? 'bg-white/40 border-black/5 text-zinc-900' : 'bg-white border-zinc-100 text-zinc-800'} backdrop-blur-sm shadow-sm`}
-                                                            >
-                                                                <div className="flex-1 min-w-0 px-1 text-left flex items-center gap-3">
-                                                                    <div className="p-2 bg-zinc-100 rounded-md text-zinc-500">
-                                                                        {msg.fileType === 'video' ? <Video className="w-5 h-5" /> :
-                                                                            msg.fileType === 'audio' ? <Music className="w-5 h-5" /> :
-                                                                                msg.fileType === 'pdf' ? <FileText className="w-5 h-5" /> :
-                                                                                    msg.fileType === 'archive' ? <Paperclip className="w-5 h-5" /> :
-                                                                                        <FileText className="w-5 h-5" />}
-                                                                    </div>
-                                                                    <p className="text-[11px] font-black uppercase tracking-widest leading-none">
-                                                                        {(msg.fileType === 'video' || msg.content?.toLowerCase().includes('video')) ? 'Video File' :
-                                                                            (msg.fileType === 'audio' || msg.content?.toLowerCase().includes('voice memo')) ? 'Audio Clip' :
-                                                                                (msg.fileType === 'pdf' || msg.content?.toLowerCase().includes('pdf')) ? 'PDF Document' :
-                                                                                    (msg.fileType === 'archive' || msg.content?.toLowerCase().includes('archive')) ? 'Archive' : 'Attachment'}
-                                                                    </p>
-                                                                </div>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        if (msg.fileUrl) window.open(msg.fileUrl, '_blank');
-                                                                    }}
-                                                                    className="p-3 bg-zinc-900 text-white rounded-md hover:bg-zinc-800 transition-all shadow-lg active:scale-95 group/dl"
-                                                                >
-                                                                    <Download className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                <p className="whitespace-pre-wrap">{msg.content}</p>
-                                            </div>
-                                        )}
-
-                                        {/* Reaction Display */}
-                                        {msg.reactionCounts && Object.keys(msg.reactionCounts).length > 0 && (
-                                            <div
-                                                onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
-                                                className={`absolute -bottom-4 ${msg.isMe ? 'right-2' : 'left-2'} flex items-center gap-1 bg-white border border-zinc-50 px-2 py-1 rounded-full shadow-sm z-20 transition-transform cursor-pointer group/rx`}
-                                            >
-                                                {Object.entries(msg.reactionCounts).map(([emoji, count]) => (
-                                                    <div key={emoji} className="flex items-center gap-1">
-                                                        <span className="text-[11px]">{emoji}</span>
-                                                        <span className="text-[10px] font-black text-zinc-500">{count as number}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        {/* Action Menu Trigger (Smile Icon on Hover) */}
-                                        {!msg.isDeleted && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
-                                                }}
-                                                className={`absolute ${msg.isMe ? '-left-10' : '-right-10'} top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-zinc-100 text-zinc-300 hover:text-black transition-all opacity-0 group-hover:opacity-100 z-10`}
-                                            >
-                                                <Smile className="w-5 h-5" />
-                                            </button>
-                                        )}
-
-                                        {/* Reaction Popover (Whatsapp Style) */}
-                                        {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                                            <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white border border-zinc-100 p-2 rounded-md shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] transition-all animate-in fade-in zoom-in-95 duration-200 z-50`}>
-                                                {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
-                                                    <button
-                                                        key={emoji}
-                                                        onClick={() => {
-                                                            toggleReaction({ messageId: msg._id, emoji });
-                                                            setActiveReactionMessageId(null);
-                                                        }}
-                                                        className={`p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50 bg-opacity-100' : ''}`}
-                                                    >
-                                                        <span className="text-xl">{emoji}</span>
-                                                    </button>
-                                                ))}
-                                                <div className="w-px h-4 bg-zinc-100 mx-1" />
-                                                {msg.isMe ? (
-                                                    <button
-                                                        onClick={() => {
-                                                            deleteMessage({ messageId: msg._id });
-                                                            setActiveReactionMessageId(null);
-                                                        }}
-                                                        className="p-1.5 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-all"
-                                                        title="Delete for Everyone"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => {
-                                                            setHiddenMessageIds(prev => new Set(prev).add(msg._id));
-                                                            setActiveReactionMessageId(null);
-                                                        }}
-                                                        className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
-                                                        title="Hide for Me"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <span className="text-[9px] font-bold text-zinc-300 mt-2.5 px-1 tracking-widest uppercase opacity-70">
-                                        {formatMessageTime(msg._creationTime)}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                            return filteredMessages?.filter(msg => !hiddenMessageIds.has(msg._id)).map((msg) => (
+                                <MessageItem
+                                    key={msg._id}
+                                    msg={msg}
+                                    isGroup={!!isGroup}
+                                    activeReactionMessageId={activeReactionMessageId}
+                                    setActiveReactionMessageId={setActiveReactionMessageId}
+                                    toggleReaction={toggleReaction}
+                                    deleteMessage={deleteMessage}
+                                    setHiddenMessageIds={setHiddenMessageIds}
+                                    setPreviewAsset={setPreviewAsset}
+                                    formatMessageTime={formatMessageTime}
+                                />
+                            ));
+                        }, [messages, filteredMessages, hiddenMessageIds, activeReactionMessageId, isGroup, toggleReaction, deleteMessage, setHiddenMessageIds, setPreviewAsset, formatMessageTime])}
                         <div ref={messagesEndRef} className="h-4" />
                     </div>
                 </div>
 
                 {/* ─── INPUT AREA ─── */}
-                <div className="p-6 md:px-20 md:py-10 bg-white border-t border-zinc-100 relative">
+                <div className="sticky bottom-0 left-0 w-full px-6 md:px-20 py-4 bg-white/80 backdrop-blur-md z-30">
                     {conversation?.isDeleted ? (
-                        <div className="flex items-center justify-center h-16 md:h-20 px-8 bg-zinc-50 rounded-2xl md:rounded-3xl border border-zinc-100">
-                            <p className="text-zinc-400 text-xs md:text-sm font-black uppercase tracking-[0.2em]">This group no longer exists</p>
+                        <div className="flex items-center justify-center h-12 bg-zinc-50 rounded-full border border-zinc-100">
+                            <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">This group no longer exists</p>
                         </div>
                     ) : (
-                        <>
+                        <div className="relative">
                             {showEmojiPicker && (
-                                <div className="absolute bottom-full left-20 mb-6 p-4 bg-white border border-zinc-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] rounded-3xl flex gap-3 animate-fade-in z-50 overflow-x-auto max-w-[80vw]">
+                                <div className="absolute bottom-full left-0 mb-4 p-4 bg-white border border-zinc-100 shadow-2xl rounded-3xl flex gap-3 animate-in fade-in slide-in-from-bottom-2 z-50 overflow-x-auto max-w-full no-scrollbar">
                                     {["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🚀", "💯", "✅", "🙌", "🎉", "🤝"].map(emoji => (
                                         <button
                                             key={emoji}
@@ -504,7 +399,7 @@ const ActiveChat = memo(function ActiveChat({
                                                 onInputChange(content + emoji);
                                                 setShowEmojiPicker(false);
                                             }}
-                                            className="text-2xl hover:bg-zinc-50 rounded-lg transition-transform p-1 duration-200"
+                                            className="text-xl hover:bg-zinc-50 rounded-lg p-1 transition-colors"
                                         >
                                             {emoji}
                                         </button>
@@ -512,12 +407,12 @@ const ActiveChat = memo(function ActiveChat({
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-4 h-16 md:h-20 px-8 shadow-sm border border-zinc-100 rounded-2xl md:rounded-3xl bg-white transition-all focus-within:shadow-indigo-500/5 focus-within:border-indigo-200 relative overflow-hidden group">
+                            <div className="flex items-center gap-3 h-12 md:h-14 px-2 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group">
                                 {isUploading && (
-                                    <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-10 transition-all">
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-5 h-5 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Processing Asset...</span>
+                                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-full z-10">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                                            <span className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Uploading...</span>
                                         </div>
                                     </div>
                                 )}
@@ -525,14 +420,13 @@ const ActiveChat = memo(function ActiveChat({
                                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
                                 <input type="file" ref={imageInputRef} accept="image/*" onChange={handleFileUpload} className="hidden" />
 
-                                <div className="flex items-center text-zinc-300">
-                                    <button
-                                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className={`p-2 hover:text-black transition-all ${showEmojiPicker ? 'text-indigo-500 bg-indigo-50' : 'hover:bg-zinc-50'} rounded-xl`}
-                                    >
-                                        <Smile className="w-6 h-6" />
-                                    </button>
-                                </div>
+                                {/* Layout/More Button */}
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-9 h-9 md:w-11 md:h-11 bg-black text-white rounded-2xl flex items-center justify-center opacity-100 hover:opacity-70 transition-opacity flex-shrink-0"
+                                >
+                                    <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
+                                </button>
 
                                 <input
                                     type="text"
@@ -540,40 +434,38 @@ const ActiveChat = memo(function ActiveChat({
                                     onChange={(e) => onInputChange(e.target.value)}
                                     onFocus={() => setShowEmojiPicker(false)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                    placeholder="Say something nice..."
-                                    className="flex-1 bg-transparent text-sm md:text-base font-semibold text-zinc-800 placeholder:text-zinc-300 focus:outline-none py-4"
+                                    placeholder="Aa"
+                                    className="flex-1 bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none px-2"
                                 />
 
-                                <div className="flex items-center gap-2 md:gap-3 text-zinc-300">
+                                <div className="flex items-center gap-1.5 pr-1">
+                                    {/* Smile Button */}
                                     <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="p-2 hover:text-black hover:bg-zinc-50 rounded-xl transition-all"
-                                        title="Attach File"
+                                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                        className={`p-2 rounded-full transition-all flex-shrink-0 text-zinc-800 opacity-100 hover:opacity-60 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
                                     >
-                                        <Paperclip className="w-6 h-6" />
+                                        <Smile className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
+
+                                    {/* Image Upload shortcut */}
                                     <button
                                         onClick={() => imageInputRef.current?.click()}
-                                        className="hidden md:flex p-2 hover:text-black hover:bg-zinc-50 rounded-xl transition-all"
-                                        title="Send Image"
+                                        className="hidden md:flex p-2 rounded-full transition-all flex-shrink-0 text-zinc-800 opacity-100 hover:opacity-60"
                                     >
-                                        <ImageIcon className="w-6 h-6" />
+                                        <ImageIcon className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
 
-                                    <div className="w-px h-8 bg-zinc-100 mx-1 hidden md:block" />
-
+                                    {/* Send Button - Always present, functional when typed */}
                                     <button
                                         onClick={() => handleSend()}
                                         disabled={!content.trim() && !isUploading}
-                                        className={`p-3 rounded-2xl transition-all ${content.trim()
-                                            ? 'bg-[#0b141b] text-white shadow-xl shadow-black/10 rotate-[-5deg]'
-                                            : 'bg-zinc-50 text-zinc-200 cursor-not-allowed grayscale'}`}
+                                        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-2xl transition-all flex-shrink-0 ${content.trim() ? 'opacity-100 hover:opacity-70 active:scale-95' : 'opacity-20 cursor-not-allowed'}`}
                                     >
-                                        <Send className="w-6 h-6" />
+                                        <Send className="w-4 h-4 md:w-5 md:h-5" />
                                     </button>
                                 </div>
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
@@ -587,7 +479,8 @@ const ActiveChat = memo(function ActiveChat({
             )}
             {previewAsset && (
                 <AssetPreviewModal
-                    url={previewAsset}
+                    url={previewAsset.url}
+                    showDownload={previewAsset.showDownload}
                     onClose={() => setPreviewAsset(null)}
                 />
             )}
@@ -595,7 +488,7 @@ const ActiveChat = memo(function ActiveChat({
     );
 });
 
-const AssetPreviewModal = ({ url, onClose }: { url: string; onClose: () => void }) => {
+const AssetPreviewModal = ({ url, showDownload, onClose }: { url: string; showDownload: boolean; onClose: () => void }) => {
     return (
         <div
             className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-xl animate-in fade-in duration-300"
@@ -615,21 +508,205 @@ const AssetPreviewModal = ({ url, onClose }: { url: string; onClose: () => void 
                 onClick={(e) => e.stopPropagation()}
             />
 
-            <div className="absolute bottom-12 flex items-center gap-4 animate-in slide-in-from-bottom-4 duration-500">
-                <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-8 py-3.5 bg-white text-black font-black text-xs uppercase tracking-widest rounded-md hover:bg-zinc-200 transition-all flex items-center gap-2 shadow-xl"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <Download className="w-4 h-4" />
-                    Download Original
-                </a>
-            </div>
+            {showDownload && (
+                <div className="absolute bottom-12 flex items-center gap-4 animate-in slide-in-from-bottom-4 duration-500">
+                    <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-8 py-3.5 bg-white text-black font-black text-xs uppercase tracking-widest rounded-md hover:bg-zinc-200 transition-all flex items-center gap-2 shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <Download className="w-4 h-4" />
+                        Download Original
+                    </a>
+                </div>
+            )}
         </div>
     );
 }
+
+const MessageItem = memo(({
+    msg,
+    isGroup,
+    activeReactionMessageId,
+    setActiveReactionMessageId,
+    toggleReaction,
+    deleteMessage,
+    setHiddenMessageIds,
+    setPreviewAsset,
+    formatMessageTime,
+}: {
+    msg: any;
+    isGroup: boolean;
+    activeReactionMessageId: Id<"messages"> | null;
+    setActiveReactionMessageId: (id: Id<"messages"> | null) => void;
+    toggleReaction: any;
+    deleteMessage: any;
+    setHiddenMessageIds: any;
+    setPreviewAsset: any;
+    formatMessageTime: any;
+}) => (
+    <div className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative`}>
+        {(!msg.isMe && isGroup) && (
+            <div className="flex-shrink-0 mb-1">
+                <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-zinc-100">
+                    {msg.sender?.image ? (
+                        <img src={msg.sender?.image} className="w-full h-full object-cover" alt="" />
+                    ) : (
+                        <div className="w-full h-full bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-400">
+                            {msg.sender?.name?.charAt(0) || "U"}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )}
+
+        <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+            <div className={`relative px-4.5 py-2.5 text-[14px] md:text-[15px] font-medium leading-normal ${msg.isMe
+                ? 'bg-[#F3F4F6] text-[#111827] rounded-[24px] rounded-tr-[8px]'
+                : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
+                } ${msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : ''} transition-all`}>
+
+                {msg.isDeleted ? (
+                    <div className="flex items-center gap-2">
+                        <Trash2 className="w-3 h-3" />
+                        <span>Message deleted</span>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-3">
+                        {msg.fileUrl && (
+                            <div className="mb-1">
+                                {msg.fileType === 'image' ? (
+                                    <div className="block overflow-hidden rounded-md">
+                                        <div
+                                            className="relative cursor-zoom-in group/img"
+                                            onClick={() => msg.fileUrl && setPreviewAsset({ url: msg.fileUrl, showDownload: true })}
+                                        >
+                                            <img
+                                                src={msg.fileUrl}
+                                                className="max-w-full max-h-60 rounded-md object-contain transition-opacity duration-300 group-hover/img:opacity-90"
+                                                alt="Attachment"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`flex items-center gap-3 p-3 rounded-md border ${msg.isMe ? 'bg-white/40 border-black/5 text-zinc-900' : 'bg-white border-zinc-100 text-zinc-800'} backdrop-blur-sm shadow-sm`}
+                                    >
+                                        <div className="flex-1 min-w-0 px-1 text-left flex items-center gap-3">
+                                            <div className="p-2 bg-zinc-100 rounded-md text-zinc-500">
+                                                {msg.fileType === 'video' ? <Video className="w-5 h-5" /> :
+                                                    msg.fileType === 'audio' ? <Music className="w-5 h-5" /> :
+                                                        msg.fileType === 'pdf' ? <FileText className="w-5 h-5" /> :
+                                                            msg.fileType === 'archive' ? <Paperclip className="w-5 h-5" /> :
+                                                                <FileText className="w-5 h-5" />}
+                                            </div>
+                                            <p className="text-[11px] font-black uppercase tracking-widest leading-none">
+                                                {(msg.fileType === 'video' || msg.content?.toLowerCase().includes('video')) ? 'Video File' :
+                                                    (msg.fileType === 'audio' || msg.content?.toLowerCase().includes('voice memo')) ? 'Audio Clip' :
+                                                        (msg.fileType === 'pdf' || msg.content?.toLowerCase().includes('pdf')) ? 'PDF Document' :
+                                                            (msg.fileType === 'archive' || msg.content?.toLowerCase().includes('archive')) ? 'Archive' : 'Attachment'}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (msg.fileUrl) window.open(msg.fileUrl, '_blank');
+                                            }}
+                                            className="p-3 bg-zinc-900 text-white rounded-md hover:bg-zinc-800 transition-all shadow-lg active:scale-95 group/dl"
+                                        >
+                                            <Download className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                )}
+
+                {/* Reaction Display */}
+                {msg.reactionCounts && Object.keys(msg.reactionCounts).length > 0 && (
+                    <div
+                        onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
+                        className={`absolute -bottom-4 ${msg.isMe ? 'right-2' : 'left-2'} flex items-center gap-1 bg-white border border-zinc-50 px-2 py-1 rounded-full shadow-sm z-20 transition-transform cursor-pointer group/rx`}
+                    >
+                        {Object.entries(msg.reactionCounts).map(([emoji, count]) => (
+                            <div key={emoji} className="flex items-center gap-1">
+                                <span className="text-[11px]">{emoji}</span>
+                                <span className="text-[10px] font-black text-zinc-500">{count as number}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Action Menu Trigger (Smile Icon on Hover) */}
+                {!msg.isDeleted && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
+                        }}
+                        className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-300 hover:text-black transition-all opacity-0 group-hover:opacity-100 z-10`}
+                    >
+                        <Smile className="w-5 h-5" />
+                    </button>
+                )}
+
+                {/* Reaction Popover (Whatsapp Style) */}
+                {!msg.isDeleted && activeReactionMessageId === msg._id && (
+                    <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white border border-zinc-100 p-2 rounded-md shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] transition-all animate-in fade-in zoom-in-95 duration-200 z-50`}>
+                        {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
+                            <button
+                                key={emoji}
+                                onClick={() => {
+                                    toggleReaction({ messageId: msg._id, emoji });
+                                    setActiveReactionMessageId(null);
+                                }}
+                                className={`p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50 bg-opacity-100' : ''}`}
+                            >
+                                <span className="text-xl">{emoji}</span>
+                            </button>
+                        ))}
+                        <div className="w-px h-4 bg-zinc-100 mx-1" />
+                        {msg.isMe ? (
+                            <button
+                                onClick={() => {
+                                    deleteMessage({ messageId: msg._id });
+                                    setActiveReactionMessageId(null);
+                                }}
+                                className="p-1.5 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-all"
+                                title="Delete for Everyone"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    setHiddenMessageIds((prev: any) => {
+                                        const next = new Set(prev);
+                                        next.add(msg._id);
+                                        return next;
+                                    });
+                                    setActiveReactionMessageId(null);
+                                }}
+                                className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                                title="Hide for Me"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+            <span className="text-[9px] font-bold text-zinc-500 mt-2 px-1 tracking-widest uppercase opacity-80">
+                {formatMessageTime(msg._creationTime)}
+            </span>
+        </div>
+    </div>
+));
+MessageItem.displayName = "MessageItem";
 
 const MessageSkeleton = ({ isMe, isGroup }: { isMe: boolean; isGroup: boolean }) => (
     <div className={`flex items-start gap-4 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
