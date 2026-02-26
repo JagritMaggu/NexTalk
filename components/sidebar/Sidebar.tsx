@@ -98,7 +98,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                 </div>
                 <div className="flex items-center justify-between gap-3">
                     <p className={`text-[11px] truncate flex-1 ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
-                        {conv.lastMessage?.content || "Tap to chat"}
+                        {conv.isDeleted ? "Group deleted, can't message" : (conv.lastMessage?.content || "Tap to chat")}
                     </p>
                     {conv.unreadCount > 0 && (
                         <span className="flex-shrink-0 min-w-5 h-5 px-1.5 flex items-center justify-center bg-[#FEF9C3] text-[#111827] text-[10px] font-black rounded-full shadow-lg shadow-black/10">

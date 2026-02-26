@@ -442,7 +442,7 @@ const ActiveChat = memo(function ActiveChat({
                                     {/* Smile Button */}
                                     <button
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className={`p-2 rounded-full transition-all flex-shrink-0 text-zinc-800 opacity-100 hover:opacity-60 mr-1 md:mr-0 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
+                                        className={`p-2 rounded-full transition-all flex-shrink-0 text-zinc-800 opacity-100 hover:opacity-60 mr-2 md:mr-0 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
                                     >
                                         <Smile className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
