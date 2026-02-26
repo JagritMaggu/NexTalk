@@ -351,13 +351,21 @@ export const Sidebar = memo(function Sidebar({
                             </h1>
                         </div>
                     </div>
-                    <UserButton
-                        appearance={{
-                            elements: {
-                                userButtonAvatarBox: "h-9 w-9 border border-white/20",
-                            }
-                        }}
-                    />
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsGroupModalOpen(true)}
+                            className="w-9 h-9 bg-zinc-900 rounded-xl flex items-center justify-center border border-zinc-800"
+                        >
+                            <UserPlus className="w-4.5 h-4.5 text-zinc-400" />
+                        </button>
+                        <UserButton
+                            appearance={{
+                                elements: {
+                                    userButtonAvatarBox: "h-9 w-9 border border-white/20",
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
 
