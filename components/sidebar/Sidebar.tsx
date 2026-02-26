@@ -411,14 +411,14 @@ export const Sidebar = memo(function Sidebar({
                         <div className="flex items-center gap-1 bg-zinc-50 md:bg-white/5 p-1 rounded-md">
                             <button
                                 onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
-                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'bg-white md:bg-white/10 text-indigo-500 md:text-white shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-zinc-200'}`}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'bg-white md:bg-[#FEF9C3] text-indigo-500 md:text-[#111827] shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-[#FEF9C3]'}`}
                                 title="All Chats"
                             >
                                 <Inbox className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setActiveTab("people")}
-                                className={`p-1.5 rounded transition-all ${activeTab === 'people' ? 'bg-white md:bg-white/10 text-indigo-500 md:text-white shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-zinc-200'}`}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'people' ? 'bg-white md:bg-[#FEF9C3] text-indigo-500 md:text-[#111827] shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-[#FEF9C3]'}`}
                                 title="People"
                             >
                                 <Users className="w-4 h-4" />
@@ -512,21 +512,21 @@ export const Sidebar = memo(function Sidebar({
                 </button>
 
                 {/* Mobile Navigation */}
-                <div className="absolute bottom-14 left-0 w-full px-8 pointer-events-none md:hidden">
-                    <div className="bg-black py-4 px-8 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto border border-white/10">
+                <div className="absolute bottom-16 left-0 w-full px-8 pointer-events-none md:hidden">
+                    <div className="bg-black py-3 px-8 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto border border-white/10">
                         <button
                             onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
-                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'text-white' : 'text-zinc-600'}`}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'text-[#FEF9C3]' : 'text-zinc-600'}`}
                         >
                             <Inbox className="w-4.5 h-4.5" />
                             <span className="text-[8px] font-bold">All</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("people")}
-                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'people' ? 'text-white' : 'text-zinc-600'}`}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'people' ? 'text-[#FEF9C3]' : 'text-zinc-600'}`}
                         >
                             <Users className="w-4.5 h-4.5" />
-                            <span className="text-[8px] font-bold">People</span>
+                            <span className="text-[8px] font-bold">Members</span>
                         </button>
                         <button
                             onClick={() => { setActiveTab("chats"); setViewMode("favorites"); }}
