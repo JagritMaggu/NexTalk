@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ChatApp | Connect Real-time",
-  description: "A premium real-time chat application built with Convex and Clerk",
+  title: "NexTalk — Premium Real-time Messaging",
+  description: "Experience ultra-fast communication with NexTalk. A high-performance chat platform featuring seamless real-time synchronization, secure auth, and a stunning modern interface.",
 };
 
 export default function RootLayout({
