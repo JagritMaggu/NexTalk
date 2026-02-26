@@ -320,7 +320,7 @@ export const Sidebar = memo(function Sidebar({
                         <Users className="w-5 h-5" />
                     </button>
                     <div>
-                        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">ChatApp</p>
+                        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">NexTalk</p>
                         <h1 className="text-sm font-black text-white">{activeTab === 'chats' ? 'Conversations' : 'All Members'}</h1>
                     </div>
                 </div>
@@ -331,7 +331,7 @@ export const Sidebar = memo(function Sidebar({
             <div className="flex md:hidden px-6 pt-12 pb-8 flex-col bg-[#0b141b] text-white">
                 <div className="flex items-center justify-between mb-2">
                     <div>
-                        <p className="text-zinc-500 text-[10px] font-medium uppercase tracking-widest">ChatApp</p>
+                        <p className="text-zinc-500 text-[10px] font-medium uppercase tracking-widest">NexTalk</p>
                         <h1 className="text-xl font-black mt-0.5 tracking-tight">
                             {activeTab === 'chats' ? 'Chats' : 'Members'}
                         </h1>
