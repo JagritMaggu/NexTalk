@@ -505,14 +505,14 @@ export const Sidebar = memo(function Sidebar({
                 {/* WhatsApp-style Sticky Plus Button */}
                 <button
                     onClick={() => setIsGroupModalOpen(true)}
-                    className="absolute bottom-28 md:bottom-10 right-8 w-8 h-8 bg-[#FEF9C3] hover:opacity-90 text-[#111827] rounded-md hidden md:flex items-center justify-center z-[60] group shadow-xl transition-all active:scale-95"
+                    className="absolute bottom-32 md:bottom-10 right-8 w-8 h-8 bg-[#FEF9C3] hover:opacity-90 text-[#111827] rounded-md hidden md:flex items-center justify-center z-[60] group shadow-xl transition-all active:scale-95"
                     title="New Group"
                 >
                     <Plus className="w-4 h-4" strokeWidth={3} />
                 </button>
 
                 {/* Mobile Navigation */}
-                <div className="absolute bottom-10 left-0 w-full px-8 pointer-events-none md:hidden">
+                <div className="absolute bottom-14 left-0 w-full px-8 pointer-events-none md:hidden">
                     <div className="bg-black py-4 px-8 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto border border-white/10">
                         <button
                             onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
