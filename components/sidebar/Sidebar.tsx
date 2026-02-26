@@ -101,7 +101,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                         {conv.lastMessage?.content || "Tap to chat"}
                     </p>
                     {conv.unreadCount > 0 && (
-                        <span className="flex-shrink-0 min-w-5 h-5 px-1.5 flex items-center justify-center bg-indigo-500 text-white text-[10px] font-black rounded-full shadow-lg shadow-indigo-500/20 animate-pulse">
+                        <span className="flex-shrink-0 min-w-5 h-5 px-1.5 flex items-center justify-center bg-[#FEF9C3] text-[#111827] text-[10px] font-black rounded-full shadow-lg shadow-black/10">
                             {conv.unreadCount}
                         </span>
                     )}
