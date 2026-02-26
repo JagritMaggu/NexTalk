@@ -64,7 +64,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
             </div>
             <div className="flex-1 text-left min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                    <span className={`truncate text-xs md:text-sm ${conv.unreadCount > 0 ? 'font-black text-indigo-400' : 'font-bold text-black md:text-white'}`}>
+                    <span className={`truncate text-xs md:text-sm ${conv.unreadCount > 0 ? 'font-black text-[#FEF9C3]' : 'font-bold text-black md:text-white'}`}>
                         {displayName}
                     </span>
                     <div className="flex items-center gap-2">
@@ -91,7 +91,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                         >
                             <Star className={`w-4 h-4 ${isStarred ? 'fill-current' : ''}`} />
                         </button>
-                        <span className={`text-[10px] uppercase md:normal-case tracking-tighter md:tracking-normal whitespace-nowrap ${conv.unreadCount > 0 ? 'font-black text-indigo-400' : 'font-black md:font-medium text-zinc-300 md:text-zinc-600'}`}>
+                        <span className={`text-[10px] uppercase md:normal-case tracking-tighter md:tracking-normal whitespace-nowrap ${conv.unreadCount > 0 ? 'font-black text-[#FEF9C3]' : 'font-black md:font-medium text-zinc-300 md:text-zinc-600'}`}>
                             {new Date(conv.lastMessage?._creationTime || conv._creationTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                     </div>
