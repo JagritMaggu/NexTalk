@@ -100,8 +100,8 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                 <div className="relative px-6 py-5 border-b border-zinc-900 bg-zinc-900/50">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-md bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                                <Users className="w-5 h-5 text-indigo-400" />
+                            <div className="w-10 h-10 rounded-md bg-[#FEF9C3]/10 flex items-center justify-center border border-[#FEF9C3]/20">
+                                <Users className="w-5 h-5 text-[#FEF9C3]" />
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold text-white tracking-tight">New Group</h2>
@@ -132,18 +132,18 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                 className="hidden"
                             />
 
-                            <div className="w-20 h-20 rounded-md bg-zinc-900 flex items-center justify-center border-2 border-dashed border-zinc-800 group-hover:border-indigo-500/50 transition-all overflow-hidden relative">
+                            <div className="w-20 h-20 rounded-md bg-zinc-900 flex items-center justify-center border-2 border-dashed border-zinc-800 group-hover:border-[#FEF9C3]/50 transition-all overflow-hidden relative">
                                 {imagePreview ? (
                                     <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
                                 ) : (
-                                    <Camera className="w-8 h-8 text-zinc-700 group-hover:text-indigo-400 transition-colors" />
+                                    <Camera className="w-8 h-8 text-zinc-700 group-hover:text-[#FEF9C3] transition-colors" />
                                 )}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                     <ImageIcon className="w-6 h-6 text-white" />
                                 </div>
                             </div>
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-indigo-500 rounded-full border-4 border-[#0b141b] flex items-center justify-center shadow-lg">
-                                <Plus className="w-3 h-3 text-white" />
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#FEF9C3] rounded-full border-4 border-[#0b141b] flex items-center justify-center shadow-lg">
+                                <Plus className="w-3 h-3 text-[#111827]" />
                             </div>
                         </div>
 
@@ -154,7 +154,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                 value={groupName}
                                 onChange={(e) => setGroupName(e.target.value)}
                                 placeholder="Team Awesome"
-                                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md px-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md px-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FEF9C3]/50 focus:ring-4 focus:ring-[#FEF9C3]/10 transition-all"
                             />
                         </div>
                     </div>
@@ -163,25 +163,25 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                     <div className="space-y-4">
                         <div className="flex items-center justify-between px-1">
                             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Add Members</label>
-                            <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                            <span className="text-[10px] font-bold text-[#FACC15] bg-[#FACC15]/10 px-2 py-0.5 rounded-full border border-[#FACC15]/20">
                                 {selectedUsers.length} selected
                             </span>
                         </div>
 
                         {/* Search */}
                         <div className="relative group">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-indigo-400 transition-colors" />
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-[#FACC15] transition-colors" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search friends..."
-                                className="w-full bg-zinc-900/30 border border-zinc-800/50 rounded-md pl-10 pr-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/30 focus:bg-zinc-900/50 transition-all"
+                                className="w-full bg-zinc-900/30 border border-zinc-800/50 rounded-md pl-10 pr-4 py-3 text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FACC15]/30 focus:bg-zinc-900/50 transition-all"
                             />
                         </div>
 
                         {/* User List */}
-                        <div className="max-h-[250px] overflow-y-auto space-y-1 pr-2 custom-scrollbar">
+                        <div className="max-h-[250px] overflow-y-auto space-y-1 pr-2 stealth-scrollbar">
                             {allUsers === undefined ? (
                                 Array(4).fill(0).map((_, i) => (
                                     <div key={i} className="flex items-center gap-3 p-3 rounded-2xl animate-shimmer">
@@ -207,20 +207,20 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                             key={user._id}
                                             onClick={() => toggleUser(user._id)}
                                             className={`w-full flex items-center gap-3 p-3 rounded-md transition-all group relative ${isSelected
-                                                ? 'bg-indigo-500/10 border border-indigo-500/20'
+                                                ? 'bg-[#FACC15]/10 border border-[#FACC15]/20'
                                                 : 'hover:bg-zinc-900/50 border border-transparent'
                                                 }`}
                                         >
                                             <div className="relative">
                                                 <img src={user.image} className="w-10 h-10 rounded-full object-cover shadow-sm grayscale-[0.3] group-hover:grayscale-0 transition-all" alt="" />
                                                 {isSelected && (
-                                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 rounded-full border-2 border-[#0b141b] flex items-center justify-center">
-                                                        <Check className="w-2.5 h-2.5 text-white stroke-[4]" />
+                                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#FACC15] rounded-full border-2 border-[#0b141b] flex items-center justify-center">
+                                                        <Check className="w-2.5 h-2.5 text-[#111827] stroke-[4]" />
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="flex-1 text-left">
-                                                <p className={`text-sm font-bold tracking-tight ${isSelected ? 'text-indigo-400' : 'text-zinc-200'}`}>
+                                                <p className={`text-sm font-bold tracking-tight ${isSelected ? 'text-[#FACC15]' : 'text-zinc-200'}`}>
                                                     {user.name}
                                                 </p>
                                                 <p className="text-[11px] font-medium text-zinc-500 truncate w-40">

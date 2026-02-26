@@ -321,7 +321,11 @@ export const Sidebar = memo(function Sidebar({
                     </button>
                     <div>
                         <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">NexTalk</p>
-                        <h1 className="text-sm font-black text-white">{activeTab === 'chats' ? 'Conversations' : 'All Members'}</h1>
+                        <h1 className="text-sm font-black text-white">
+                            {activeTab === 'people' ? 'All Members' :
+                                viewMode === 'favorites' ? 'Favorites' :
+                                    viewMode === 'archived' ? 'Archived Chats' : 'Recent Chats'}
+                        </h1>
                     </div>
                 </div>
                 <UserButton appearance={{ elements: { userButtonAvatarBox: "h-8 w-8 border border-white/10" } }} />
@@ -333,7 +337,9 @@ export const Sidebar = memo(function Sidebar({
                     <div>
                         <p className="text-zinc-500 text-[10px] font-medium uppercase tracking-widest">NexTalk</p>
                         <h1 className="text-xl font-black mt-0.5 tracking-tight">
-                            {activeTab === 'chats' ? 'Chats' : 'Members'}
+                            {activeTab === 'people' ? 'All Members' :
+                                viewMode === 'favorites' ? 'Favorites' :
+                                    viewMode === 'archived' ? 'Archived Chats' : 'Recent Chats'}
                         </h1>
                     </div>
                     <div className="flex items-center gap-3">

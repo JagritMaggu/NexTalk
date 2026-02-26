@@ -163,20 +163,20 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                     </button>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto no-scrollbar">
+                <div className="max-h-[70vh] overflow-y-auto stealth-scrollbar">
                     {/* Image & Name Section */}
                     <div className="p-8 flex flex-col items-center gap-6">
                         <div className="relative group">
                             <div className="w-24 h-24 rounded-md overflow-hidden bg-zinc-900 border-4 border-zinc-800 shadow-xl">
                                 {isUploading ? (
                                     <div className="w-full h-full flex items-center justify-center bg-zinc-900">
-                                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                                        <Loader2 className="w-8 h-8 text-[#FEF9C3] animate-spin" />
                                     </div>
                                 ) : (
                                     conversation.groupImage ? (
                                         <img src={conversation.groupImage} className="w-full h-full object-cover" alt="" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-indigo-500 text-white text-3xl font-black">
+                                        <div className="w-full h-full flex items-center justify-center bg-[#FEF9C3] text-[#111827] text-3xl font-black">
                                             {conversation.groupName?.charAt(0) || "G"}
                                         </div>
                                     )
@@ -185,7 +185,7 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                             {canManage && (
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="absolute -bottom-2 -right-2 p-3 bg-[#0b141b] border border-zinc-800 rounded-md shadow-lg text-indigo-500 active:scale-95 transition-all"
+                                    className="absolute -bottom-2 -right-2 p-3 bg-[#0b141b] border border-zinc-800 rounded-md shadow-lg text-[#FEF9C3] active:scale-95 transition-all"
                                 >
                                     <Camera className="w-5 h-5" />
                                 </button>
@@ -201,14 +201,14 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                                     value={groupName}
                                     onChange={(e) => setGroupName(e.target.value)}
                                     disabled={!canManage}
-                                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md px-6 py-4 text-sm font-bold text-white focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all disabled:opacity-50 placeholder:text-zinc-600"
+                                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md px-6 py-4 text-sm font-bold text-white focus:ring-2 focus:ring-[#FEF9C3]/20 outline-none transition-all disabled:opacity-50 placeholder:text-zinc-600"
                                     placeholder="Enter group name..."
                                 />
                                 {canManage && groupName !== conversation.groupName && (
                                     <button
                                         onClick={handleSaveDetails}
                                         disabled={isSaving}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-indigo-500 text-white rounded-md shadow-lg hover:bg-indigo-600 transition-all disabled:opacity-50"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-[#FEF9C3] text-[#111827] rounded-md shadow-lg hover:bg-[#FEF9C3]/90 transition-all disabled:opacity-50"
                                     >
                                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                     </button>
@@ -220,7 +220,7 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                         <div className="w-full space-y-3">
                             <div className="flex items-center justify-between px-1">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Media, Links and Docs</label>
-                                <div className="flex items-center gap-1 text-[10px] font-black text-indigo-500 uppercase tracking-widest cursor-pointer">
+                                <div className="flex items-center gap-1 text-[10px] font-black text-[#FEF9C3] uppercase tracking-widest cursor-pointer">
                                     {(sharedMedia as any)?.length || 0} <ChevronRight className="w-3 h-3" />
                                 </div>
                             </div>
@@ -276,7 +276,7 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                             {canManage && (
                                 <button
                                     onClick={() => setIsAddModalOpen(true)}
-                                    className="p-1.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md hover:bg-indigo-500/20 transition-all flex items-center gap-1.5"
+                                    className="p-1.5 bg-[#FACC15]/10 text-[#FACC15] border border-[#FACC15]/20 rounded-md hover:bg-[#FACC15]/20 transition-all flex items-center gap-1.5"
                                 >
                                     <UserPlus className="w-3.5 h-3.5" />
                                     <span className="text-[9px] font-black uppercase tracking-widest">Add</span>
@@ -305,7 +305,7 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                                                         <ShieldCheck className="w-2.5 h-2.5" /> Creator
                                                     </span>
                                                 ) : member.role === "admin" ? (
-                                                    <span className="text-[9px] font-black uppercase tracking-tighter text-indigo-500 flex items-center gap-0.5 bg-indigo-500/10 px-1.5 py-0.5 rounded-md border border-indigo-500/20">
+                                                    <span className="text-[9px] font-black uppercase tracking-tighter text-[#FACC15] flex items-center gap-0.5 bg-[#FACC15]/10 px-1.5 py-0.5 rounded-md border border-[#FACC15]/20">
                                                         <Shield className="w-2.5 h-2.5" /> Admin
                                                     </span>
                                                 ) : (
@@ -330,7 +330,7 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                                                 ) : (
                                                     <button
                                                         onClick={() => handleMemberAction(member._id, "promote")}
-                                                        className="p-2 text-zinc-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-md transition-all"
+                                                        className="p-2 text-zinc-500 hover:text-[#FACC15] hover:bg-[#FACC15]/10 rounded-md transition-all"
                                                         title="Make Admin"
                                                     >
                                                         <ShieldCheck className="w-4 h-4" />

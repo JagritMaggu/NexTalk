@@ -312,7 +312,7 @@ const ActiveChat = memo(function ActiveChat({
                     ) : (
                         <button
                             onClick={() => setIsSearching(true)}
-                            className="p-2 transition-all text-zinc-500 hover:text-white hidden md:flex"
+                            className="p-2 transition-all text-zinc-500 hover:text-[#FACC15] md:hover:text-[#FEF9C3] hidden md:flex"
                         >
                             <Search className="w-5 h-5 transition-colors" />
                         </button>
