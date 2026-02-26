@@ -382,7 +382,7 @@ export const Sidebar = memo(function Sidebar({
                                             <button
                                                 key={r}
                                                 onClick={() => { setTimeRange(r); setOpenDropdown(null); }}
-                                                className={`w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:bg-zinc-50 md:hover:bg-white/5 ${timeRange === r ? 'text-indigo-500 md:text-indigo-400' : 'text-zinc-400'}`}
+                                                className={`w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:bg-zinc-50 md:hover:bg-white/5 ${timeRange === r ? 'text-[#FACC15]' : 'text-zinc-400'}`}
                                             >
                                                 {r}
                                             </button>
@@ -400,8 +400,8 @@ export const Sidebar = memo(function Sidebar({
                                 </button>
                                 {openDropdown === "sort" && (
                                     <div className="absolute top-full left-0 mt-2 w-36 bg-white md:bg-[#1e2329] border border-zinc-100 md:border-white/5 rounded-md shadow-2xl py-1 z-50">
-                                        <button onClick={() => { setSortOrder("Newest"); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider text-zinc-400 hover:bg-zinc-50 md:hover:bg-white/5">Newest First</button>
-                                        <button onClick={() => { setSortOrder("Oldest"); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider text-zinc-400 hover:bg-zinc-50 md:hover:bg-white/5">Oldest First</button>
+                                        <button onClick={() => { setSortOrder("Newest"); setOpenDropdown(null); }} className={`w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider hover:bg-zinc-50 md:hover:bg-white/5 ${sortOrder === "Newest" ? 'text-[#FACC15]' : 'text-zinc-400'}`}>Newest First</button>
+                                        <button onClick={() => { setSortOrder("Oldest"); setOpenDropdown(null); }} className={`w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-wider hover:bg-zinc-50 md:hover:bg-white/5 ${sortOrder === "Oldest" ? 'text-[#FACC15]' : 'text-zinc-400'}`}>Oldest First</button>
                                     </div>
                                 )}
                             </div>
@@ -411,14 +411,14 @@ export const Sidebar = memo(function Sidebar({
                         <div className="flex items-center gap-1 bg-zinc-50 md:bg-white/5 p-1 rounded-md">
                             <button
                                 onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
-                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'bg-white md:bg-[#FEF9C3] text-indigo-500 md:text-[#111827] shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-[#FEF9C3]'}`}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'bg-white md:bg-transparent text-indigo-500 md:text-[#FACC15] shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-[#FACC15]'}`}
                                 title="All Chats"
                             >
                                 <Inbox className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setActiveTab("people")}
-                                className={`p-1.5 rounded transition-all ${activeTab === 'people' ? 'bg-white md:bg-[#FEF9C3] text-indigo-500 md:text-[#111827] shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-[#FEF9C3]'}`}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'people' ? 'bg-white md:bg-transparent text-indigo-500 md:text-[#FACC15] shadow-sm md:shadow-none' : 'text-zinc-400 hover:text-zinc-600 md:hover:text-[#FACC15]'}`}
                                 title="People"
                             >
                                 <Users className="w-4 h-4" />
@@ -513,17 +513,17 @@ export const Sidebar = memo(function Sidebar({
 
                 {/* Mobile Navigation */}
                 <div className="absolute bottom-16 left-0 w-full px-8 pointer-events-none md:hidden">
-                    <div className="bg-black py-3 px-8 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto border border-white/10">
+                    <div className="bg-black py-2.5 px-8 rounded-full flex items-center justify-between shadow-2xl pointer-events-auto border border-white/10">
                         <button
                             onClick={() => { setActiveTab("chats"); setViewMode("all"); }}
-                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'text-[#FEF9C3]' : 'text-zinc-600'}`}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chats' && viewMode === 'all' ? 'text-white' : 'text-zinc-600'}`}
                         >
                             <Inbox className="w-4.5 h-4.5" />
                             <span className="text-[8px] font-bold">All</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("people")}
-                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'people' ? 'text-[#FEF9C3]' : 'text-zinc-600'}`}
+                            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'people' ? 'text-white' : 'text-zinc-600'}`}
                         >
                             <Users className="w-4.5 h-4.5" />
                             <span className="text-[8px] font-bold">Members</span>
