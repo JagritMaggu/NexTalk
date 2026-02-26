@@ -442,7 +442,7 @@ export const Sidebar = memo(function Sidebar({
 
                     {/* Unified Search Bar */}
                     <div className="relative flex items-center bg-zinc-50 md:bg-black/10 rounded-xl h-12 px-5 group focus-within:bg-zinc-100 md:focus-within:bg-black/20 transition-all border border-transparent focus-within:border-zinc-200 md:focus-within:border-white/5">
-                        <Search className="w-4 h-4 text-zinc-300 md:text-zinc-700 group-focus-within:text-indigo-500 transition-colors" />
+                        <Search className="w-4 h-4 text-zinc-300 md:text-zinc-700 group-focus-within:text-[#FACC15] md:group-focus-within:text-[#FEF9C3] transition-colors" />
                         <input
                             type="text"
                             placeholder="Search chats..."
