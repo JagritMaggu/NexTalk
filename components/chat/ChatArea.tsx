@@ -228,7 +228,7 @@ const ActiveChat = memo(function ActiveChat({
     return (
         <div className="flex flex-col h-full w-full bg-[#0b141b] md:bg-[#fcfdfe] relative overflow-hidden">
             {/* ─── HEADER (Optimized with Memo & Shimmer) ─── */}
-            <div className="px-6 md:px-10 h-20 flex items-center justify-between border-b border-white/5 bg-[#0b141b] sticky top-0 z-20">
+            <div className="px-6 md:px-10 pt-14 md:pt-0 h-32 md:h-20 flex items-center justify-between border-b border-white/5 bg-[#0b141b] sticky top-0 z-20">
                 {useMemo(() => {
                     if (conversation === undefined) {
                         return (

@@ -312,13 +312,13 @@ export const Sidebar = memo(function Sidebar({
             {/* ─── DESKTOP HEADER (Restored & Taller) ─── */}
             <div className="hidden md:flex h-20 px-6 items-center justify-between border-b border-white/5 bg-black/5">
                 <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => setActiveTab(activeTab === 'chats' ? 'people' : 'chats')}
-                        className={`transition-colors flex-shrink-0 ${activeTab === 'people' ? 'text-white' : 'text-zinc-500 hover:text-white'}`}
-                        title="Toggle People/Chats"
-                    >
-                        <Users className="w-5 h-5" />
-                    </button>
+                    <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-xl border border-white/10 shadow-lg bg-white">
+                        <img
+                            src="/BrandLogo/brandlogo.jpg"
+                            className="w-full h-full object-contain select-none p-1 scale-[1.5]"
+                            alt="NexTalk"
+                        />
+                    </div>
                     <div>
                         <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">NexTalk</p>
                         <h1 className="text-sm font-black text-white">
@@ -334,29 +334,30 @@ export const Sidebar = memo(function Sidebar({
             {/* ─── MOBILE HEADER (Dark Section Restored) ─── */}
             <div className="flex md:hidden px-6 pt-12 pb-8 flex-col bg-[#0b141b] text-white">
                 <div className="flex items-center justify-between mb-2">
-                    <div>
-                        <p className="text-zinc-500 text-[10px] font-medium uppercase tracking-widest">NexTalk</p>
-                        <h1 className="text-xl font-black mt-0.5 tracking-tight">
-                            {activeTab === 'people' ? 'All Members' :
-                                viewMode === 'favorites' ? 'Favorites' :
-                                    viewMode === 'archived' ? 'Archived Chats' : 'Recent Chats'}
-                        </h1>
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-zinc-800 overflow-hidden shadow-md flex-shrink-0">
+                            <img
+                                src="/BrandLogo/brandlogo.jpg"
+                                className="w-full h-full object-contain select-none p-1 scale-[1.5]"
+                                alt="NexTalk"
+                            />
+                        </div>
+                        <div>
+                            <p className="text-zinc-500 text-[10px] font-medium uppercase tracking-widest">NexTalk</p>
+                            <h1 className="text-xl font-black mt-0.5 tracking-tight">
+                                {activeTab === 'people' ? 'All Members' :
+                                    viewMode === 'favorites' ? 'Favorites' :
+                                        viewMode === 'archived' ? 'Archived Chats' : 'Recent Chats'}
+                            </h1>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setIsGroupModalOpen(true)}
-                            className="w-9 h-9 bg-zinc-900 rounded-xl flex items-center justify-center border border-zinc-800"
-                        >
-                            <UserPlus className="w-4.5 h-4.5 text-zinc-400" />
-                        </button>
-                        <UserButton
-                            appearance={{
-                                elements: {
-                                    userButtonAvatarBox: "h-9 w-9 border border-white/20",
-                                }
-                            }}
-                        />
-                    </div>
+                    <UserButton
+                        appearance={{
+                            elements: {
+                                userButtonAvatarBox: "h-9 w-9 border border-white/20",
+                            }
+                        }}
+                    />
                 </div>
             </div>
 
