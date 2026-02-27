@@ -407,7 +407,7 @@ const ActiveChat = memo(function ActiveChat({
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-2 md:gap-3 h-12 md:h-14 pl-2 pr-4 md:px-4 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group">
+                            <div className="flex items-center gap-2 md:gap-3 h-12 md:h-14 pl-2 pr-14 md:px-4 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group">
                                 {isUploading && (
                                     <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-full z-10">
                                         <div className="flex items-center gap-2">
@@ -438,7 +438,7 @@ const ActiveChat = memo(function ActiveChat({
                                     className="flex-1 bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none px-2"
                                 />
 
-                                <div className="flex items-center gap-0.5 md:gap-1.5 pr-1 md:pr-0">
+                                <div className="flex items-center gap-2 md:gap-1.5 pr-1 md:pr-0">
                                     {/* Smile Button */}
                                     <button
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
