@@ -30,6 +30,8 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
     const displayImage = isGroup ? conv.groupImage : conv.otherParticipants?.[0]?.image;
     const isOnline = !isGroup && conv.otherParticipants?.[0]?.isOnline;
 
+    const typingUsers = useQuery(api.typing.getTypingUsers, { conversationId: conv._id });
+
     return (
         <div
             onClick={onClick}
@@ -97,9 +99,17 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                     </div>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                    <p className={`text-[11px] truncate flex-1 ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
-                        {conv.isDeleted ? "Group deleted, can't message" : (conv.lastMessage?.content || "Tap to chat")}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                        {typingUsers && typingUsers.length > 0 ? (
+                            <p className="text-[11px] text-green-500 font-bold italic animate-pulse truncate">
+                                {isGroup ? `${typingUsers[0]?.name} is typing...` : 'typing...'}
+                            </p>
+                        ) : (
+                            <p className={`text-[11px] truncate ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
+                                {conv.isDeleted ? "Group deleted, can't message" : (conv.lastMessage?.content || "Tap to chat")}
+                            </p>
+                        )}
+                    </div>
                     {conv.unreadCount > 0 && (
                         <span className="flex-shrink-0 min-w-5 h-5 px-1.5 flex items-center justify-center bg-[#FEF9C3] text-[#111827] text-[10px] font-black rounded-full shadow-lg shadow-black/10">
                             {conv.unreadCount}
