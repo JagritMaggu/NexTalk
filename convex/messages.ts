@@ -99,13 +99,14 @@ export const getMessages = query({
                     .collect();
 
                 // Group reactions by emoji with counts
-                const reactionCounts = reactions.reduce(
-                    (acc, r) => {
-                        acc[r.emoji] = (acc[r.emoji] || 0) + 1;
-                        return acc;
-                    },
-                    {} as Record<string, number>
-                );
+                const counts: Record<string, number> = {};
+                reactions.forEach((r) => {
+                    counts[r.emoji] = (counts[r.emoji] || 0) + 1;
+                });
+                const reactionCounts = Object.entries(counts).map(([emoji, count]) => ({
+                    emoji,
+                    count,
+                }));
 
                 // Check if current user reacted to this message
                 const myReactions = reactions

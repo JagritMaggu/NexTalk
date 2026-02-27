@@ -665,15 +665,15 @@ const MessageItem = memo(({
                 )}
 
                 {/* Reaction Display */}
-                {msg.reactionCounts && Object.keys(msg.reactionCounts).length > 0 && (
+                {msg.reactionCounts && msg.reactionCounts.length > 0 && (
                     <div
                         onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
                         className={`absolute -bottom-4 ${msg.isMe ? 'right-2' : 'left-2'} flex items-center gap-1 bg-white border border-zinc-50 px-2 py-1 rounded-full shadow-sm z-20 transition-transform cursor-pointer group/rx`}
                     >
-                        {Object.entries(msg.reactionCounts).map(([emoji, count]) => (
+                        {msg.reactionCounts.map(({ emoji, count }: { emoji: string, count: number }) => (
                             <div key={emoji} className="flex items-center gap-1">
                                 <span className="text-[11px]">{emoji}</span>
-                                <span className="text-[10px] font-black text-zinc-500">{count as number}</span>
+                                <span className="text-[10px] font-black text-zinc-500">{count}</span>
                             </div>
                         ))}
                     </div>
