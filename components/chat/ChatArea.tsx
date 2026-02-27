@@ -383,7 +383,7 @@ const ActiveChat = memo(function ActiveChat({
                 </div>
 
                 {/* ─── INPUT AREA ─── */}
-                <div className="sticky bottom-0 left-0 w-full px-10 md:px-20 py-4 bg-white/80 backdrop-blur-md z-30">
+                <div className="sticky bottom-0 left-0 w-full px-4 md:px-20 py-4 bg-white/80 backdrop-blur-md z-30">
                     {conversation?.isDeleted ? (
                         <div className="flex items-center justify-center h-12 bg-zinc-50 rounded-full border border-zinc-100">
                             <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">This group no longer exists</p>
