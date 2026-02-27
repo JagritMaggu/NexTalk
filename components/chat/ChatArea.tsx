@@ -273,13 +273,16 @@ const ActiveChat = memo(function ActiveChat({
                                 </h3>
                                 <div className="flex items-center gap-1.5 mt-0.5">
                                     {typingUsers && typingUsers.length > 0 ? (
-                                        <span className="text-[10px] font-bold text-indigo-500 flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-yellow-600 md:text-[#FEF9C3] flex items-center gap-1.5 animate-pulse">
                                             <span className="flex gap-0.5">
-                                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
+                                                <span className="w-1 h-1 bg-current rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                                <span className="w-1 h-1 bg-current rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                                <span className="w-1 h-1 bg-current rounded-full animate-bounce" />
                                             </span>
-                                            typing...
+                                            {isGroup
+                                                ? `${typingUsers.map(u => u?.name?.split(' ')[0]).join(', ')} ${typingUsers.length > 1 ? 'are' : 'is'} typing...`
+                                                : 'typing...'
+                                            }
                                         </span>
                                     ) : (
                                         <span className={`text-[9px] font-bold uppercase tracking-widest ${isOnline ? 'text-green-500' : 'text-zinc-400'}`}>
@@ -377,7 +380,33 @@ const ActiveChat = memo(function ActiveChat({
                                     formatMessageTime={formatMessageTime}
                                 />
                             ));
-                        }, [messages, filteredMessages, hiddenMessageIds, activeReactionMessageId, isGroup, toggleReaction, deleteMessage, setHiddenMessageIds, setPreviewAsset, formatMessageTime])}
+                        }, [messages, filteredMessages, hiddenMessageIds, activeReactionMessageId, isGroup, typingUsers, toggleReaction, deleteMessage, setHiddenMessageIds, setPreviewAsset, formatMessageTime])}
+
+                        {/* Static Typing Bubble */}
+                        {typingUsers && typingUsers.length > 0 && (
+                            <div className="flex items-start gap-3 animate-in fade-in slide-in-from-left-2 duration-300">
+                                {isGroup && (
+                                    <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
+                                        <Smile className="w-4 h-4 text-zinc-400" />
+                                    </div>
+                                )}
+                                <div className="flex flex-col items-start">
+                                    {isGroup && (
+                                        <span className="text-[10px] font-bold text-zinc-500 mb-1 ml-1 tracking-tight">
+                                            {typingUsers[0]?.name}
+                                        </span>
+                                    )}
+                                    <div className="bg-[#FEF9C3] text-yellow-800 px-4 py-2.5 rounded-[24px] rounded-tl-[4px] shadow-sm flex items-center gap-1.5 border border-yellow-200/50">
+                                        <span className="text-[11px] font-black uppercase tracking-[0.15em]">typing</span>
+                                        <div className="flex gap-0.5 items-center">
+                                            <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                            <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                            <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-bounce" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <div ref={messagesEndRef} className="h-4" />
                     </div>
                 </div>
@@ -567,6 +596,11 @@ const MessageItem = memo(({
         )}
 
         <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+            {(!msg.isMe && isGroup) && (
+                <span className="text-[10px] font-bold text-zinc-500 mb-1 ml-1 tracking-tight">
+                    {msg.sender?.name}
+                </span>
+            )}
             <div className={`relative px-4.5 py-2.5 text-[14px] md:text-[15px] font-medium leading-normal ${msg.isMe
                 ? 'bg-[#F3F4F6] text-[#111827] rounded-[24px] rounded-tr-[8px]'
                 : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
