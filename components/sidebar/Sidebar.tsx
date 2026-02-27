@@ -66,8 +66,13 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
             </div>
             <div className="flex-1 text-left min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                    <span className={`truncate text-xs md:text-sm ${conv.unreadCount > 0 ? 'font-black text-yellow-600 md:text-[#FEF9C3]' : 'font-bold text-black md:text-white'}`}>
+                    <span className={`truncate text-xs md:text-sm flex items-center gap-2 ${conv.unreadCount > 0 ? 'font-black text-yellow-600 md:text-[#FEF9C3]' : 'font-bold text-black md:text-white'}`}>
                         {displayName}
+                        {isGroup && (
+                            <span className="text-[8px] px-1.5 py-0.5 bg-zinc-100 md:bg-white/10 text-zinc-500 md:text-zinc-400 rounded-sm font-black uppercase tracking-tighter">
+                                {conv.participantIds?.length} members
+                            </span>
+                        )}
                     </span>
                     <div className="flex items-center gap-2">
                         <button

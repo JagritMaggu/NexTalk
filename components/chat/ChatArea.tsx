@@ -668,7 +668,7 @@ const MessageItem = memo(({
                 {msg.reactionCounts && msg.reactionCounts.length > 0 && (
                     <div
                         onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
-                        className={`absolute -bottom-3 ${msg.isMe ? 'right-3' : 'left-3'} flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-full shadow-[0_2px_8px_-3px_rgba(0,0,0,0.08)] z-20 transition-all hover:scale-110 cursor-pointer group/rx`}
+                        className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
                     >
                         {msg.reactionCounts.map(({ emoji, count }: { emoji: string, count: number }) => (
                             <div key={emoji} className="flex items-center gap-1">
@@ -694,7 +694,7 @@ const MessageItem = memo(({
 
                 {/* Reaction Popover (Whatsapp Style) */}
                 {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                    <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white border border-zinc-100 p-2 rounded-md shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] transition-all animate-in fade-in zoom-in-95 duration-200 z-50`}>
+                    <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white border border-zinc-100 p-2 rounded-md transition-all animate-in fade-in zoom-in-95 duration-200 z-50`}>
                         {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
                             <button
                                 key={emoji}
@@ -702,7 +702,7 @@ const MessageItem = memo(({
                                     toggleReaction({ messageId: msg._id, emoji });
                                     setActiveReactionMessageId(null);
                                 }}
-                                className={`p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50 bg-opacity-100' : ''}`}
+                                className={`p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
                             >
                                 <span className="text-xl">{emoji}</span>
                             </button>
@@ -714,7 +714,7 @@ const MessageItem = memo(({
                                     deleteMessage({ messageId: msg._id });
                                     setActiveReactionMessageId(null);
                                 }}
-                                className="p-1.5 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-full transition-all"
+                                className="p-1.5 hover:bg-red-50 text-red-500 rounded-full transition-all"
                                 title="Delete for Everyone"
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -735,6 +735,14 @@ const MessageItem = memo(({
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         )}
+                        <div className="w-px h-4 bg-zinc-100 mx-1" />
+                        <button
+                            onClick={() => setActiveReactionMessageId(null)}
+                            className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                            title="Close"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
                     </div>
                 )}
             </div>
