@@ -383,7 +383,7 @@ const ActiveChat = memo(function ActiveChat({
                 </div>
 
                 {/* ─── INPUT AREA ─── */}
-                <div className="sticky bottom-0 left-0 w-full px-6 md:px-20 py-4 bg-white/80 backdrop-blur-md z-30">
+                <div className="sticky bottom-0 left-0 w-full px-10 md:px-20 py-4 bg-white/80 backdrop-blur-md z-30">
                     {conversation?.isDeleted ? (
                         <div className="flex items-center justify-center h-12 bg-zinc-50 rounded-full border border-zinc-100">
                             <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">This group no longer exists</p>
@@ -407,7 +407,7 @@ const ActiveChat = memo(function ActiveChat({
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-2 md:gap-3 h-12 md:h-14 pl-2 pr-14 md:px-4 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group">
+                            <div className="flex items-center h-12 md:h-14 px-1.5 md:px-4 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group">
                                 {isUploading && (
                                     <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-full z-10">
                                         <div className="flex items-center gap-2">
@@ -421,28 +421,32 @@ const ActiveChat = memo(function ActiveChat({
                                 <input type="file" ref={imageInputRef} accept="image/*" onChange={handleFileUpload} className="hidden" />
 
                                 {/* Layout/More Button */}
-                                <button
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="w-9 h-9 md:w-11 md:h-11 bg-black text-white rounded-2xl flex items-center justify-center opacity-100 hover:opacity-70 transition-opacity flex-shrink-0"
-                                >
-                                    <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
-                                </button>
+                                <div className="flex-shrink-0">
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="w-9 h-9 md:w-11 md:h-11 bg-black text-white rounded-2xl flex items-center justify-center opacity-100 hover:opacity-70 transition-opacity"
+                                    >
+                                        <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
+                                    </button>
+                                </div>
 
-                                <input
-                                    type="text"
-                                    value={content}
-                                    onChange={(e) => onInputChange(e.target.value)}
-                                    onFocus={() => setShowEmojiPicker(false)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                    placeholder="Aa"
-                                    className="flex-1 bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none px-2"
-                                />
+                                <div className="flex-1 min-w-0 mx-2">
+                                    <input
+                                        type="text"
+                                        value={content}
+                                        onChange={(e) => onInputChange(e.target.value)}
+                                        onFocus={() => setShowEmojiPicker(false)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                                        placeholder="Aa"
+                                        className="w-full bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+                                    />
+                                </div>
 
-                                <div className="flex items-center gap-2 md:gap-1.5 pr-1 md:pr-0">
+                                <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                                     {/* Smile Button */}
                                     <button
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className={`p-2 rounded-full transition-all flex-shrink-0 text-zinc-800 opacity-100 hover:opacity-60 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
+                                        className={`p-2 rounded-full transition-all text-zinc-800 hover:bg-zinc-200/50 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
                                     >
                                         <Smile className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
@@ -450,16 +454,16 @@ const ActiveChat = memo(function ActiveChat({
                                     {/* Image Upload shortcut */}
                                     <button
                                         onClick={() => imageInputRef.current?.click()}
-                                        className="hidden md:flex p-2 rounded-full transition-all flex-shrink-0 text-zinc-800 opacity-100 hover:opacity-60"
+                                        className="hidden md:flex p-2 rounded-full transition-all text-zinc-800 hover:opacity-60"
                                     >
-                                        <ImageIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                        <ImageIcon className="w-6 h-6" />
                                     </button>
 
-                                    {/* Send Button - Always present, functional when typed */}
+                                    {/* Send Button */}
                                     <button
                                         onClick={() => handleSend()}
                                         disabled={!content.trim() && !isUploading}
-                                        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-2xl transition-all flex-shrink-0 ${content.trim() ? 'opacity-100 hover:opacity-70 active:scale-95' : 'opacity-20 cursor-not-allowed'}`}
+                                        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-2xl transition-all ${content.trim() ? 'opacity-100 hover:opacity-70 active:scale-95' : 'opacity-20'}`}
                                     >
                                         <Send className="w-4 h-4 md:w-5 md:h-5" />
                                     </button>
