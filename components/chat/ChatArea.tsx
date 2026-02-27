@@ -686,7 +686,7 @@ const MessageItem = memo(({
                             e.stopPropagation();
                             setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
                         }}
-                        className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-300 hover:text-black transition-all opacity-0 group-hover:opacity-100 z-10`}
+                        className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-0 group-hover:opacity-100 z-10`}
                     >
                         <Smile className="w-5 h-5" />
                     </button>
