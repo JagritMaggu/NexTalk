@@ -664,16 +664,16 @@ const MessageItem = memo(({
                     </div>
                 )}
 
-                {/* Reaction Display */}
+                {/* Reaction Display - Refined Style & Positioning */}
                 {msg.reactionCounts && msg.reactionCounts.length > 0 && (
                     <div
                         onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
-                        className={`absolute -bottom-4 ${msg.isMe ? 'right-2' : 'left-2'} flex items-center gap-1 bg-white border border-zinc-50 px-2 py-1 rounded-full shadow-sm z-20 transition-transform cursor-pointer group/rx`}
+                        className={`absolute -bottom-3 ${msg.isMe ? 'right-3' : 'left-3'} flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-full shadow-[0_2px_8px_-3px_rgba(0,0,0,0.08)] z-20 transition-all hover:scale-110 cursor-pointer group/rx`}
                     >
                         {msg.reactionCounts.map(({ emoji, count }: { emoji: string, count: number }) => (
                             <div key={emoji} className="flex items-center gap-1">
-                                <span className="text-[11px]">{emoji}</span>
-                                <span className="text-[10px] font-black text-zinc-500">{count}</span>
+                                <span className="text-[12px] leading-none">{emoji}</span>
+                                <span className="text-[10px] font-black text-yellow-600 md:text-yellow-500">{count}</span>
                             </div>
                         ))}
                     </div>
@@ -738,7 +738,7 @@ const MessageItem = memo(({
                     </div>
                 )}
             </div>
-            <span className="text-[9px] font-bold text-zinc-500 mt-2 px-1 tracking-widest uppercase opacity-80">
+            <span className={`text-[9px] font-bold text-zinc-500 px-1 tracking-widest uppercase opacity-80 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-2'}`}>
                 {formatMessageTime(msg._creationTime)}
             </span>
         </div>

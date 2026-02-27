@@ -98,7 +98,7 @@ export const getMessages = query({
                     .withIndex("by_messageId", (q) => q.eq("messageId", message._id))
                     .collect();
 
-                // Group reactions by emoji with counts
+                // Group reactions by emoji with counts (using array to avoid ASCII field name restrictions)
                 const counts: Record<string, number> = {};
                 reactions.forEach((r) => {
                     counts[r.emoji] = (counts[r.emoji] || 0) + 1;
