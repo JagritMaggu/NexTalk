@@ -932,6 +932,7 @@ const MessageItem = memo(({
                 )}
             </div>
 
+
             {/* Reaction Display - Refined Style & Positioning */}
             {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
                 <div
@@ -1030,27 +1031,27 @@ const MessageItem = memo(({
                     </button>
                 </div>
             )}
-        </div>
-        <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
-            <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
-                {formatMessageTime(msg._creationTime)}
-                {msg.isEdited && (
-                    <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">(edited)</span>
-                )}
-            </span>
-            {msg.isMe && !msg.isDeleted && (
-                <div className="flex items-center">
-                    {msg.readByAll ? (
-                        <CheckCheck className="w-3.5 h-3.5 text-blue-500" strokeWidth={3} />
-                    ) : msg.deliveredAt ? (
-                        <CheckCheck className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
-                    ) : (
-                        <Check className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+            <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
+                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
+                    {formatMessageTime(msg._creationTime)}
+                    {msg.isEdited && (
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">(edited)</span>
                     )}
-                </div>
-            )}
+                </span>
+                {msg.isMe && !msg.isDeleted && (
+                    <div className="flex items-center">
+                        {msg.readByAll ? (
+                            <CheckCheck className="w-3.5 h-3.5 text-blue-500" strokeWidth={3} />
+                        ) : msg.deliveredAt ? (
+                            <CheckCheck className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+                        ) : (
+                            <Check className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
-    </div>
+    </div >
 ));
 MessageItem.displayName = "MessageItem";
 
