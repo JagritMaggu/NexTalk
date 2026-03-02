@@ -106,7 +106,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
                         {typingUsers && typingUsers.length > 0 ? (
-                            <p className="text-[11px] text-yellow-600 md:text-[#FEF9C3] font-bold italic animate-pulse truncate">
+                            <p className="text-[11px] text-yellow-600 md:text-[#FEF9C3] font-bold italic truncate">
                                 {isGroup ? `${typingUsers[0]?.name} is typing...` : 'typing...'}
                             </p>
                         ) : (

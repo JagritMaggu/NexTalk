@@ -290,7 +290,7 @@ const ActiveChat = memo(function ActiveChat({
                                 </h3>
                                 <div className="flex items-center gap-1.5 mt-0.5">
                                     {typingUsers && typingUsers.length > 0 ? (
-                                        <span className="text-[10px] font-bold text-yellow-600 md:text-[#FEF9C3] flex items-center gap-1.5 animate-pulse">
+                                        <span className="text-[10px] font-bold text-yellow-600 md:text-[#FEF9C3] flex items-center gap-1.5">
                                             <span className="flex gap-0.5">
                                                 <span className="w-1 h-1 bg-current rounded-full animate-bounce [animation-delay:-0.3s]" />
                                                 <span className="w-1 h-1 bg-current rounded-full animate-bounce [animation-delay:-0.15s]" />
