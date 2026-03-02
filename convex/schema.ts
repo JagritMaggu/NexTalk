@@ -41,6 +41,7 @@ export default defineSchema({
         seenAt: v.optional(v.number()),      // Feature: Read Receipts
         isEdited: v.optional(v.boolean()),   // Feature: Message Editing
         editedAt: v.optional(v.number()),    // Feature: Message Editing
+        parentMessageId: v.optional(v.id("messages")), // Feature: Quoted Replies
     })
         .index("by_conversationId", ["conversationId"]),
 

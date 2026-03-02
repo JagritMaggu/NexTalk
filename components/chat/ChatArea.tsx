@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2 } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -57,6 +57,7 @@ const ActiveChat = memo(function ActiveChat({
     const [searchQuery, setSearchQuery] = useState("");
     const [editingId, setEditingId] = useState<Id<"messages"> | null>(null);
     const [editContent, setEditContent] = useState("");
+    const [replyingTo, setReplyingTo] = useState<any | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -145,6 +146,7 @@ const ActiveChat = memo(function ActiveChat({
         const currentContent = text;
         setContent("");
         setShowEmojiPicker(false);
+        setReplyingTo(null);
         await clearTyping({ conversationId });
 
         try {
@@ -152,7 +154,8 @@ const ActiveChat = memo(function ActiveChat({
                 conversationId,
                 content: currentContent,
                 fileStorageId: overrides?.fileStorageId,
-                fileType: overrides?.fileType
+                fileType: overrides?.fileType,
+                parentMessageId: replyingTo?._id,
             });
         } catch (error) {
             console.error("Failed to send message", error);
@@ -397,6 +400,10 @@ const ActiveChat = memo(function ActiveChat({
                                         setEditContent(content);
                                         setActiveReactionMessageId(null);
                                     }}
+                                    onReply={(msg: any) => {
+                                        setReplyingTo(msg);
+                                        setActiveReactionMessageId(null);
+                                    }}
                                 />
                             ));
                         }, [messages, filteredMessages, hiddenMessageIds, activeReactionMessageId, isGroup, typingUsers, toggleReaction, deleteMessage, setHiddenMessageIds, setPreviewAsset, formatMessageTime])}
@@ -452,6 +459,26 @@ const ActiveChat = memo(function ActiveChat({
                                             {emoji}
                                         </button>
                                     ))}
+                                </div>
+                            )}
+
+                            {replyingTo && (
+                                <div className="absolute bottom-full left-0 w-full mb-3 p-3 bg-zinc-50 border border-zinc-100 shadow-lg rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-2 z-40">
+                                    <div className="flex items-center gap-3 overflow-hidden">
+                                        <div className="p-2 bg-zinc-200/50 rounded-full flex-shrink-0">
+                                            <CornerUpLeft className="w-3.5 h-3.5 text-zinc-500" />
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Replying to {replyingTo.sender?.name}</span>
+                                            <p className="text-xs text-zinc-400 line-clamp-1 italic">{replyingTo.content}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setReplyingTo(null)}
+                                        className="p-1.5 hover:bg-zinc-200 rounded-full transition-colors flex-shrink-0"
+                                    >
+                                        <X className="w-4 h-4 text-zinc-400" />
+                                    </button>
                                 </div>
                             )}
 
@@ -620,6 +647,7 @@ const MessageItem = memo(({
     setPreviewAsset,
     formatMessageTime,
     onEdit,
+    onReply,
 }: {
     msg: any;
     isGroup: boolean;
@@ -631,8 +659,9 @@ const MessageItem = memo(({
     setPreviewAsset: any;
     formatMessageTime: any;
     onEdit: (msgId: Id<"messages">, content: string) => void;
+    onReply: (msg: any) => void;
 }) => (
-    <div className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative`}>
+    <div id={msg._id} className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative scroll-mt-20`}>
         {(!msg.isMe && isGroup) && (
             <div className="flex-shrink-0 mb-1">
                 <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-100">
@@ -657,6 +686,24 @@ const MessageItem = memo(({
                 ? 'bg-black text-white rounded-[24px] rounded-tr-[8px]'
                 : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
                 } ${msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : ''} transition-all`}>
+
+                {msg.parentMessage && !msg.isDeleted && (
+                    <div
+                        onClick={() => {
+                            const el = document.getElementById(msg.parentMessage.id);
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            el?.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
+                            setTimeout(() => el?.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
+                        }}
+                        className={`mb-2 p-2 rounded-lg text-xs border-l-4 cursor-pointer transition-all hover:opacity-80 ${msg.isMe ? 'bg-white/10 border-white/30 text-white/70' : 'bg-black/5 border-black/20 text-black/50'}`}
+                    >
+                        <div className="font-bold mb-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-1">
+                            <Quote className="w-2 h-2" />
+                            {msg.parentMessage.senderName}
+                        </div>
+                        <p className="line-clamp-1 italic">{msg.parentMessage.content}</p>
+                    </div>
+                )}
 
                 {msg.isDeleted ? (
                     <div className="flex items-center gap-2">
@@ -759,6 +806,14 @@ const MessageItem = memo(({
                                 <span className="text-xl">{emoji}</span>
                             </button>
                         ))}
+                        <div className="w-px h-4 bg-zinc-100 mx-1" />
+                        <button
+                            onClick={() => onReply(msg)}
+                            className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                            title="Reply"
+                        >
+                            <CornerUpLeft className="w-4 h-4" />
+                        </button>
                         {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
                             <button
                                 onClick={() => onEdit(msg._id, msg.content)}

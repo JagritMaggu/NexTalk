@@ -8,8 +8,9 @@ export const sendMessage = mutation({
         content: v.string(),
         fileStorageId: v.optional(v.id("_storage")),
         fileType: v.optional(v.string()),
+        parentMessageId: v.optional(v.id("messages")),
     },
-    handler: async (ctx, { conversationId, content, fileStorageId, fileType }) => {
+    handler: async (ctx, { conversationId, content, fileStorageId, fileType, parentMessageId }) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Unauthorized");
 
@@ -39,6 +40,7 @@ export const sendMessage = mutation({
             fileStorageId,
             fileType,
             deliveredAt: Date.now(),
+            parentMessageId,
         });
 
         // Update conversation's lastMessageId for sidebar preview
@@ -130,6 +132,20 @@ export const getMessages = query({
                     fileUrl = await ctx.storage.getUrl(message.fileStorageId);
                 }
 
+                // Fetch parent message details if it exists (Quoted Replies)
+                let parentMessage = null;
+                if (message.parentMessageId) {
+                    const parent = await ctx.db.get(message.parentMessageId);
+                    if (parent) {
+                        const parentSender = await ctx.db.get(parent.senderId);
+                        parentMessage = {
+                            content: parent.isDeleted ? "Message deleted" : parent.content,
+                            senderName: parentSender?.name || "Unknown",
+                            id: parent._id,
+                        };
+                    }
+                }
+
                 return {
                     ...message,
                     sender,
@@ -139,6 +155,7 @@ export const getMessages = query({
                     isMe: message.senderId === currentUser._id,
                     // True if participants have seen past this message's creation time
                     readByAll: memberReadProgress.length > 0 && message._creationTime <= minReadTime,
+                    parentMessage,
                 };
             })
         );
