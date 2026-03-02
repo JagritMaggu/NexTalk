@@ -832,7 +832,7 @@ const MessageItem = memo(({
             </div>
         )}
 
-        <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+        <div className={`relative flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
             {(!msg.isMe && isGroup) && (
                 <span className="text-[10px] font-bold text-zinc-500 mb-1 ml-1 tracking-tight">
                     {msg.sender?.name}
@@ -954,15 +954,15 @@ const MessageItem = memo(({
                         e.stopPropagation();
                         setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
                     }}
-                    className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
+                    className={`absolute ${msg.isMe ? '-left-10 md:-left-8' : '-right-10 md:-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
                 >
-                    <Smile className="w-5 h-5 text-black" />
+                    <Smile className="w-5 h-5 transition-colors" />
                 </button>
             )}
 
             {/* Reaction Popover (Whatsapp Style) */}
             {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
+                <div className={`absolute top-full mt-1 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
                     {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
                         <button
                             key={emoji}
