@@ -16,15 +16,15 @@ import {
     ChevronDown,
     UserPlus,
     PlusCircle,
-    X,
-    Archive,
     Inbox,
-    Plus
+    Plus,
+    Check,
+    CheckCheck
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import CreateGroupModal from "./CreateGroupModal";
 
-const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived }: any) => {
+const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, me }: any) => {
     const isGroup = conv.isGroup;
     const displayName = isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
     const displayImage = isGroup ? conv.groupImage : conv.otherParticipants?.[0]?.image;
@@ -110,9 +110,22 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                 {isGroup ? `${typingUsers[0]?.name} is typing...` : 'typing...'}
                             </p>
                         ) : (
-                            <p className={`text-[11px] truncate ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
-                                {conv.isDeleted ? "Group deleted, can't message" : (conv.lastMessage?.content || "Tap to chat")}
-                            </p>
+                            <div className="flex items-center gap-1 min-w-0">
+                                {conv.lastMessage && conv.lastMessage.senderId === me?._id && !conv.isDeleted && (
+                                    <div className="flex-shrink-0">
+                                        {conv.lastMessage.readByAll ? (
+                                            <CheckCheck className="w-3.5 h-3.5 text-green-500" />
+                                        ) : conv.lastMessage.deliveredAt ? (
+                                            <CheckCheck className="w-3.5 h-3.5 text-zinc-400" />
+                                        ) : (
+                                            <Check className="w-3.5 h-3.5 text-zinc-400" />
+                                        )}
+                                    </div>
+                                )}
+                                <p className={`text-[11px] truncate ${conv.unreadCount > 0 ? 'font-bold text-zinc-800 md:text-zinc-200' : 'font-semibold md:font-medium text-zinc-400 md:text-zinc-500'}`}>
+                                    {conv.isDeleted ? "Group deleted, can't message" : (conv.lastMessage?.content || "Tap to chat")}
+                                </p>
+                            </div>
                         )}
                     </div>
                     {conv.unreadCount > 0 && (
@@ -500,6 +513,7 @@ export const Sidebar = memo(function Sidebar({
                                         isStarred={starredIds.has(conv._id)}
                                         onToggleArchive={() => toggleArchive(conv._id)}
                                         isArchived={archivedIds.has(conv._id)}
+                                        me={me}
                                     />
                                 ))
                             ) : (
