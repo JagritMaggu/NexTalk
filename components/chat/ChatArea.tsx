@@ -518,11 +518,10 @@ const ActiveChat = memo(function ActiveChat({
 
                     {/* Pinned Messages Bar */}
                     {pinnedMessages && pinnedMessages.length > 0 && (
-                        <div className="absolute top-0 left-0 right-0 z-[50] bg-white/80 backdrop-blur-md border-b border-zinc-100 px-4 py-2 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
-                            <Pin className="w-4 h-4 text-indigo-500 fill-current" />
+                        <div className="absolute top-0 left-0 right-0 z-[50] bg-[#0b141b] border-b border-white/10 px-4 py-2 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <Pin className="w-3.5 h-3.5 text-indigo-400 fill-current flex-shrink-0" />
                             <div className="flex-1 min-w-0 overflow-hidden">
-                                <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-1">Pinned Message</p>
-                                <p className="text-xs font-bold text-zinc-900 truncate">
+                                <p className="text-xs font-medium text-white/80 truncate">
                                     {pinnedMessages[0].content || (pinnedMessages[0].fileType === 'audio' ? "Audio Clip" : pinnedMessages[0].fileType === 'image' ? "Image" : "Shared File")}
                                 </p>
                             </div>
@@ -533,7 +532,7 @@ const ActiveChat = memo(function ActiveChat({
                                     el?.classList.add('ring-4', 'ring-indigo-500/20', 'rounded-2xl');
                                     setTimeout(() => el?.classList.remove('ring-4', 'ring-indigo-500/20'), 2000);
                                 }}
-                                className="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-600 transition-colors"
+                                className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:text-indigo-300 transition-colors flex-shrink-0"
                             >
                                 View
                             </button>
