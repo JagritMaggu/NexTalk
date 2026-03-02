@@ -810,7 +810,7 @@ const MessageItem = memo(({
                         <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         <button
                             onClick={() => onReply(msg)}
-                            className="p-1 md:p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                            className="p-1 md:p-1.5 hover:bg-emerald-50 text-emerald-500 rounded-full transition-all"
                             title="Reply"
                         >
                             <CornerUpLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -855,7 +855,7 @@ const MessageItem = memo(({
                         <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         <button
                             onClick={() => setActiveReactionMessageId(null)}
-                            className="p-1 md:p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                            className="p-1 md:p-1.5 hover:bg-sky-50 text-sky-500 rounded-full transition-all"
                             title="Close"
                         >
                             <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
