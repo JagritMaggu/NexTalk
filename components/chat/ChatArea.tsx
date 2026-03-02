@@ -463,21 +463,22 @@ const ActiveChat = memo(function ActiveChat({
                             )}
 
                             {replyingTo && (
-                                <div className="absolute bottom-full left-0 w-full mb-3 p-3 bg-zinc-50 border border-zinc-100 shadow-lg rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-2 z-40">
-                                    <div className="flex items-center gap-3 overflow-hidden">
-                                        <div className="p-2 bg-zinc-200/50 rounded-full flex-shrink-0">
-                                            <CornerUpLeft className="w-3.5 h-3.5 text-zinc-500" />
+                                <div className="absolute bottom-full left-0 w-full mb-4 bg-white/95 backdrop-blur-xl border border-zinc-100 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-3xl flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-3">
+                                    <div className="w-1.5 bg-black" />
+                                    <div className="flex-1 flex items-center gap-4 py-4 px-4 overflow-hidden">
+                                        <div className="p-2.5 bg-zinc-100 rounded-xl flex-shrink-0">
+                                            <CornerUpLeft className="w-4 h-4 text-black" strokeWidth={2.5} />
                                         </div>
                                         <div className="flex flex-col min-w-0">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Replying to {replyingTo.sender?.name}</span>
-                                            <p className="text-xs text-zinc-400 line-clamp-1 italic">{replyingTo.content}</p>
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-900 mb-0.5">Replying to {replyingTo.sender?.name}</span>
+                                            <p className="text-sm text-zinc-500 line-clamp-1 font-medium italic opacity-80 leading-tight">"{replyingTo.content}"</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => setReplyingTo(null)}
-                                        className="p-1.5 hover:bg-zinc-200 rounded-full transition-colors flex-shrink-0"
+                                        className="self-center p-2 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all flex-shrink-0"
                                     >
-                                        <X className="w-4 h-4 text-zinc-400" />
+                                        <X className="w-5 h-5" />
                                     </button>
                                 </div>
                             )}
@@ -695,13 +696,13 @@ const MessageItem = memo(({
                             el?.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
                             setTimeout(() => el?.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
                         }}
-                        className={`mb-2 p-2 rounded-lg text-xs border-l-4 cursor-pointer transition-all hover:opacity-80 ${msg.isMe ? 'bg-white/10 border-white/30 text-white/70' : 'bg-black/5 border-black/20 text-black/50'}`}
+                        className={`-mx-4.5 -mt-2.5 mb-2.5 p-3 rounded-t-[inherit] border-b cursor-pointer transition-all hover:opacity-80 flex flex-col gap-0.5 ${msg.isMe ? 'bg-white/10 border-white/5 text-white/70' : 'bg-black/5 border-black/5 text-black/50'}`}
                     >
-                        <div className="font-bold mb-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-1">
-                            <Quote className="w-2 h-2" />
+                        <div className="font-black text-[10px] uppercase tracking-[0.15em] flex items-center gap-2">
+                            <div className={`w-1 h-3 rounded-full ${msg.isMe ? 'bg-white/40' : 'bg-black/20'}`} />
                             {msg.parentMessage.senderName}
                         </div>
-                        <p className="line-clamp-1 italic">{msg.parentMessage.content}</p>
+                        <p className="text-[12px] line-clamp-1 italic px-3 font-medium opacity-90">{msg.parentMessage.content}</p>
                     </div>
                 )}
 
