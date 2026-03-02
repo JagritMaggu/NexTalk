@@ -504,11 +504,15 @@ const ActiveChat = memo(function ActiveChat({
                                 <div className="flex-1 min-w-0 mx-2">
                                     <input
                                         type="text"
-                                        value={content}
-                                        onChange={(e) => onInputChange(e.target.value)}
+                                        value={editingId ? editContent : content}
+                                        onChange={(e) => editingId ? setEditContent(e.target.value) : onInputChange(e.target.value)}
                                         onFocus={() => setShowEmojiPicker(false)}
-                                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                        placeholder="Aa"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                editingId ? handleEdit() : handleSend();
+                                            }
+                                        }}
+                                        placeholder={editingId ? "Edit message..." : "Aa"}
                                         className="w-full bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
                                     />
                                 </div>
@@ -530,13 +534,17 @@ const ActiveChat = memo(function ActiveChat({
                                         <ImageIcon className="w-6 h-6" />
                                     </button>
 
-                                    {/* Send Button */}
+                                    {/* Send/Update Button */}
                                     <button
-                                        onClick={() => handleSend()}
-                                        disabled={!content.trim() && !isUploading}
-                                        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-2xl transition-all ${content.trim() ? 'opacity-100 hover:opacity-70 active:scale-95' : 'opacity-20'}`}
+                                        onClick={editingId ? handleEdit : () => handleSend()}
+                                        disabled={!(editingId ? editContent : content).trim() && !isUploading}
+                                        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-2xl transition-all ${(editingId ? editContent : content).trim() ? 'opacity-100 hover:opacity-70 active:scale-95' : 'opacity-20'}`}
                                     >
-                                        <Send className="w-4 h-4 md:w-5 md:h-5" />
+                                        {editingId ? (
+                                            <Check className="w-4 h-4 md:w-5 md:h-5" />
+                                        ) : (
+                                            <Send className="w-4 h-4 md:w-5 md:h-5" />
+                                        )}
                                     </button>
                                 </div>
                             </div>
