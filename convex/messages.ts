@@ -88,59 +88,46 @@ export const getMessages = query({
             .order("asc")
             .collect();
 
-        // Fetch all members of this conversation once
+        // Fetch all members to get their progress
         const members = await ctx.db
             .query("conversationMembers")
             .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
             .collect();
 
-        // Enrich messages with sender details, reactions, and read status
+        // Pre-fetch the creation times of the last seen messages for all other members
+        const memberReadProgress = await Promise.all(
+            members
+                .filter(m => m.userId !== currentUser._id)
+                .map(async (m) => {
+                    if (!m.lastSeenMessageId) return 0;
+                    const lastMsg = await ctx.db.get(m.lastSeenMessageId);
+                    return lastMsg?._creationTime || 0;
+                })
+        );
+
+        // A message is "readByAll" if its creationTime is <= the creationTime 
+        // of EVERY other member's last seen message.
+        const minReadTime = memberReadProgress.length > 0 ? Math.min(...memberReadProgress) : 0;
+
+        // Enrich messages
         const enrichedMessages = await Promise.all(
             messages.map(async (message) => {
                 const sender = await ctx.db.get(message.senderId);
-
-                // Fetch reactions for this message
                 const reactions = await ctx.db
                     .query("reactions")
                     .withIndex("by_messageId", (q) => q.eq("messageId", message._id))
                     .collect();
 
-                // Group reactions by emoji with counts (using array to avoid ASCII field name restrictions)
                 const counts: Record<string, number> = {};
                 reactions.forEach((r) => {
                     counts[r.emoji] = (counts[r.emoji] || 0) + 1;
                 });
-                const reactionCounts = Object.entries(counts).map(([emoji, count]) => ({
-                    emoji,
-                    count,
-                }));
+                const reactionCounts = Object.entries(counts).map(([emoji, count]) => ({ emoji, count }));
+                const myReactions = reactions.filter((r) => r.userId === currentUser._id).map((r) => r.emoji);
 
-                // Check if current user reacted to this message
-                const myReactions = reactions
-                    .filter((r) => r.userId === currentUser._id)
-                    .map((r) => r.emoji);
-
-                // Get file URL if there's an attachment
                 let fileUrl = null;
                 if (message.fileStorageId) {
                     fileUrl = await ctx.storage.getUrl(message.fileStorageId);
-                }
-
-                // Calculate read status (WhatsApp-style)
-                // For a message to be "readByAll", every other participant must have seen it
-                let readByAll = false;
-                if (message.senderId === currentUser._id) {
-                    const otherMembers = members.filter(m => m.userId !== currentUser._id);
-                    if (otherMembers.length > 0) {
-                        const readReceipts = await Promise.all(
-                            otherMembers.map(async (m) => {
-                                if (!m.lastSeenMessageId) return false;
-                                const lastSeen = await ctx.db.get(m.lastSeenMessageId);
-                                return lastSeen && lastSeen._creationTime >= message._creationTime;
-                            })
-                        );
-                        readByAll = readReceipts.every(r => r === true);
-                    }
                 }
 
                 return {
@@ -150,7 +137,8 @@ export const getMessages = query({
                     myReactions,
                     fileUrl,
                     isMe: message.senderId === currentUser._id,
-                    readByAll,
+                    // True if participants have seen past this message's creation time
+                    readByAll: memberReadProgress.length > 0 && message._creationTime <= minReadTime,
                 };
             })
         );
