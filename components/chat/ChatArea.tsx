@@ -64,6 +64,7 @@ const ActiveChat = memo(function ActiveChat({
     const imageInputRef = useRef<HTMLInputElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messageInputRef = useRef<HTMLInputElement>(null);
 
     const conversation = useQuery(api.conversations.getConversationById, { conversationId });
     const messages = useQuery(api.messages.getMessages, { conversationId });
@@ -417,10 +418,12 @@ const ActiveChat = memo(function ActiveChat({
                                         setEditingId(msgId);
                                         setEditContent(content);
                                         setActiveReactionMessageId(null);
+                                        setTimeout(() => messageInputRef.current?.focus(), 0);
                                     }}
                                     onReply={(msg: any) => {
                                         setReplyingTo(msg);
                                         setActiveReactionMessageId(null);
+                                        setTimeout(() => messageInputRef.current?.focus(), 0);
                                     }}
                                 />
                             ));
@@ -548,6 +551,7 @@ const ActiveChat = memo(function ActiveChat({
 
                                 <div className="flex-1 min-w-0 mx-2">
                                     <input
+                                        ref={messageInputRef}
                                         type="text"
                                         value={editingId ? editContent : content}
                                         onChange={(e) => editingId ? setEditContent(e.target.value) : onInputChange(e.target.value)}
