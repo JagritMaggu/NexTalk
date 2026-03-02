@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote, Mic, StopCircle, Square } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -58,7 +58,12 @@ const ActiveChat = memo(function ActiveChat({
     const [editingId, setEditingId] = useState<Id<"messages"> | null>(null);
     const [editContent, setEditContent] = useState("");
     const [replyingTo, setReplyingTo] = useState<any | null>(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingDuration, setRecordingDuration] = useState(0);
     const isFirstLoad = useRef(true);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +102,13 @@ const ActiveChat = memo(function ActiveChat({
             markAsRead({ conversationId });
         }
     }, [conversationId, messages, markAsRead]);
+
+    // Cleanup recording timer on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, []);
 
     // Reset first load when conversation changes
     useEffect(() => {
@@ -243,6 +255,88 @@ const ActiveChat = memo(function ActiveChat({
             if (fileInputRef.current) fileInputRef.current.value = "";
             if (imageInputRef.current) imageInputRef.current.value = "";
         }
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                if (audioBlob.size > 0 && !isRecordingCancelledRef.current) {
+                    await uploadAudio(audioBlob);
+                }
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+            isRecordingCancelledRef.current = false;
+            setRecordingDuration(0);
+            timerRef.current = setInterval(() => {
+                setRecordingDuration(prev => prev + 1);
+            }, 1000);
+        } catch (error) {
+            console.error("Error accessing microphone:", error);
+            toast.error("Could not access microphone");
+        }
+    };
+
+    const isRecordingCancelledRef = useRef(false);
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            if (timerRef.current) clearInterval(timerRef.current);
+        }
+    };
+
+    const cancelRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            isRecordingCancelledRef.current = true;
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            if (timerRef.current) clearInterval(timerRef.current);
+            setRecordingDuration(0);
+        }
+    };
+
+    const uploadAudio = async (blob: Blob) => {
+        setIsUploading(true);
+        try {
+            const postUrl = await generateUploadUrl();
+            const result = await fetch(postUrl, {
+                method: "POST",
+                headers: { "Content-Type": "audio/webm" },
+                body: blob,
+            });
+            const { storageId } = await result.json();
+
+            await handleSend({
+                content: "Sent a voice note",
+                fileStorageId: storageId,
+                fileType: 'audio'
+            });
+        } catch (error) {
+            console.error("Audio upload failed", error);
+            toast.error("Failed to send voice note");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const formatDuration = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     const onInputChange = (val: string) => {
@@ -466,137 +560,177 @@ const ActiveChat = memo(function ActiveChat({
                         </div>
                     ) : (
                         <div className="relative">
-                            {showEmojiPicker && (
-                                <div className="absolute bottom-full left-0 mb-4 p-4 bg-white border border-zinc-100 shadow-2xl rounded-3xl flex gap-3 animate-in fade-in slide-in-from-bottom-2 z-50 overflow-x-auto max-w-full no-scrollbar">
-                                    {["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🚀", "💯", "✅", "🙌", "🎉", "🤝"].map(emoji => (
+                            {isRecording ? (
+                                <div className="flex items-center gap-4 bg-zinc-900 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                        <span className="text-sm font-bold tracking-tight">{formatDuration(recordingDuration)}</span>
+                                        <div className="flex-1 overflow-hidden">
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 truncate">Recording voice note...</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                         <button
-                                            key={emoji}
-                                            onClick={() => {
-                                                onInputChange(content + emoji);
-                                                setShowEmojiPicker(false);
-                                            }}
-                                            className="text-xl hover:bg-zinc-50 rounded-lg p-1 transition-colors"
+                                            onClick={cancelRecording}
+                                            className="p-2 text-zinc-400 hover:text-red-500 transition-colors"
+                                            title="Cancel"
                                         >
-                                            {emoji}
+                                            <Trash2 className="w-5 h-5" strokeWidth={2.5} />
                                         </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            {replyingTo && (
-                                <div className="absolute bottom-full left-0 w-full mb-3 bg-zinc-800 rounded-lg flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
-                                    <div className="w-1 bg-yellow-500" />
-                                    <div className="flex-1 flex flex-col justify-center py-2 px-4 overflow-hidden">
-                                        <span className="text-[11px] font-black text-yellow-500 tracking-wider leading-tight truncate mb-0.5 uppercase">
-                                            {replyingTo.sender?.name}
-                                        </span>
-                                        <p className="text-[12px] text-zinc-100 line-clamp-1 font-medium leading-normal opacity-90">
-                                            {replyingTo.content}
-                                        </p>
+                                        <button
+                                            onClick={stopRecording}
+                                            className="w-10 h-10 bg-indigo-500 text-white rounded-full flex items-center justify-center hover:bg-indigo-600 transition-all active:scale-95 shadow-lg"
+                                            title="Send Voice Note"
+                                        >
+                                            <Send className="w-5 h-5" />
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => setReplyingTo(null)}
-                                        className="self-center p-1.5 text-zinc-500 hover:text-white transition-all flex-shrink-0"
-                                    >
-                                        <X className="w-4 h-4" strokeWidth={2.5} />
-                                    </button>
                                 </div>
-                            )}
-
-                            {editingId && (
-                                <div className="absolute bottom-full left-0 w-full mb-3 p-3 bg-[#FEF9C3] border border-yellow-200 shadow-lg rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-2 z-40">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-yellow-400/20 rounded-full">
-                                            <Edit2 className="w-3.5 h-3.5 text-yellow-700" />
+                            ) : (
+                                <>
+                                    {showEmojiPicker && (
+                                        <div className="absolute bottom-full left-0 mb-4 p-4 bg-white border border-zinc-100 shadow-2xl rounded-3xl flex gap-3 animate-in fade-in slide-in-from-bottom-2 z-50 overflow-x-auto max-w-full no-scrollbar">
+                                            {["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "🚀", "💯", "✅", "🙌", "🎉", "🤝"].map(emoji => (
+                                                <button
+                                                    key={emoji}
+                                                    onClick={() => {
+                                                        onInputChange(content + emoji);
+                                                        setShowEmojiPicker(false);
+                                                    }}
+                                                    className="text-xl hover:bg-zinc-50 rounded-lg p-1 transition-colors"
+                                                >
+                                                    {emoji}
+                                                </button>
+                                            ))}
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-800">Editing Message</span>
-                                            <p className="text-xs text-yellow-700/80 line-clamp-1 italic">"{messages?.find(m => m._id === editingId)?.content}"</p>
+                                    )}
+
+                                    {replyingTo && (
+                                        <div className="absolute bottom-full left-0 w-full mb-3 bg-zinc-800 rounded-lg flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
+                                            <div className="w-1 bg-yellow-500" />
+                                            <div className="flex-1 flex flex-col justify-center py-2 px-4 overflow-hidden">
+                                                <span className="text-[11px] font-black text-yellow-500 tracking-wider leading-tight truncate mb-0.5 uppercase">
+                                                    {replyingTo.sender?.name}
+                                                </span>
+                                                <p className="text-[12px] text-zinc-100 line-clamp-1 font-medium leading-normal opacity-90">
+                                                    {replyingTo.content}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => setReplyingTo(null)}
+                                                className="self-center p-1.5 text-zinc-500 hover:text-white transition-all flex-shrink-0"
+                                            >
+                                                <X className="w-4 h-4" strokeWidth={2.5} />
+                                            </button>
                                         </div>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            setEditingId(null);
-                                            setEditContent("");
-                                        }}
-                                        className="p-1.5 text-yellow-700/50 hover:text-yellow-800 transition-colors"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            )}
+                                    )}
 
-                            <div className="flex items-center h-12 md:h-14 px-1.5 md:px-4 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group">
-                                {isUploading && (
-                                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-full z-10">
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                                            <span className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Uploading...</span>
+                                    {editingId && (
+                                        <div className="absolute bottom-full left-0 w-full mb-3 p-3 bg-[#FEF9C3] border border-yellow-200 shadow-lg rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-2 z-40">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-yellow-400/20 rounded-full">
+                                                    <Edit2 className="w-3.5 h-3.5 text-yellow-700" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-yellow-800">Editing Message</span>
+                                                    <p className="text-xs text-yellow-700/80 line-clamp-1 italic">"{messages?.find(m => m._id === editingId)?.content}"</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setEditingId(null);
+                                                    setEditContent("");
+                                                }}
+                                                className="p-1.5 text-yellow-700/50 hover:text-yellow-800 transition-colors"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-                                <input type="file" ref={imageInputRef} accept="image/*" onChange={handleFileUpload} className="hidden" />
-
-                                {/* Layout/More Button */}
-                                <div className="flex-shrink-0">
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="w-9 h-9 md:w-11 md:h-11 bg-black text-white rounded-2xl flex items-center justify-center opacity-100 hover:opacity-70 transition-opacity"
-                                    >
-                                        <LayoutGrid className="w-4 h-4 md:w-5 md:h-5" />
-                                    </button>
-                                </div>
-
-                                <div className="flex-1 min-w-0 mx-2">
-                                    <input
-                                        ref={messageInputRef}
-                                        type="text"
-                                        value={editingId ? editContent : content}
-                                        onChange={(e) => editingId ? setEditContent(e.target.value) : onInputChange(e.target.value)}
-                                        onFocus={() => setShowEmojiPicker(false)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                editingId ? handleEdit() : handleSend();
-                                            }
-                                        }}
-                                        placeholder={editingId ? "Edit message..." : "Aa"}
-                                        className="w-full bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
-                                    />
-                                </div>
-
-                                <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-                                    {/* Smile Button */}
-                                    <button
-                                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className={`p-2 rounded-full transition-all text-zinc-800 hover:bg-zinc-200/50 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
-                                    >
-                                        <Smile className="w-5 h-5 md:w-6 md:h-6" />
-                                    </button>
-
-                                    {/* Image Upload shortcut */}
-                                    <button
-                                        onClick={() => imageInputRef.current?.click()}
-                                        className="hidden md:flex p-2 rounded-full transition-all text-zinc-800 hover:opacity-60"
-                                    >
-                                        <ImageIcon className="w-6 h-6" />
-                                    </button>
-
-                                    {/* Send/Update Button */}
-                                    <button
-                                        onClick={editingId ? handleEdit : () => handleSend()}
-                                        disabled={!(editingId ? editContent : content).trim() && !isUploading}
-                                        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-2xl transition-all ${(editingId ? editContent : content).trim() ? 'opacity-100 hover:opacity-70 active:scale-95' : 'opacity-20'}`}
-                                    >
-                                        {editingId ? (
-                                            <Check className="w-4 h-4 md:w-5 md:h-5" />
-                                        ) : (
-                                            <Send className="w-4 h-4 md:w-5 md:h-5" />
+                                    <div className="flex items-center h-12 md:h-14 px-1.5 md:px-4 rounded-full bg-zinc-100/80 border border-transparent focus-within:bg-white focus-within:border-zinc-200 transition-all group relative overflow-hidden">
+                                        {isUploading && (
+                                            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-full z-10">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                                                    <span className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Uploading...</span>
+                                                </div>
+                                            </div>
                                         )}
-                                    </button>
-                                </div>
-                            </div>
+
+                                        <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+                                        <input type="file" ref={imageInputRef} accept="image/*" onChange={handleFileUpload} className="hidden" />
+
+                                        {/* Layout/More Button */}
+                                        <div className="flex-shrink-0">
+                                            <button
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="w-8 h-8 md:w-10 md:h-10 bg-black text-white rounded-full flex items-center justify-center hover:opacity-70 transition-opacity"
+                                            >
+                                                <LayoutGrid className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex-1 min-w-0 mx-2">
+                                            <input
+                                                ref={messageInputRef}
+                                                type="text"
+                                                value={editingId ? editContent : content}
+                                                onChange={(e) => editingId ? setEditContent(e.target.value) : onInputChange(e.target.value)}
+                                                onFocus={() => setShowEmojiPicker(false)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        editingId ? handleEdit() : handleSend();
+                                                    }
+                                                }}
+                                                placeholder={editingId ? "Edit message..." : "Aa"}
+                                                className="w-full bg-transparent text-sm md:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                                            {/* Smile Button */}
+                                            <button
+                                                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                                className={`p-1.5 rounded-full transition-all text-zinc-800 hover:bg-zinc-200/50 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
+                                            >
+                                                <Smile className="w-5 h-5 md:w-6 md:h-6" strokeWidth={2.5} />
+                                            </button>
+
+                                            {/* Image Upload shortcut */}
+                                            <button
+                                                onClick={() => imageInputRef.current?.click()}
+                                                className="hidden md:flex p-1.5 rounded-full transition-all text-zinc-800 hover:opacity-60"
+                                            >
+                                                <ImageIcon className="w-6 h-6" strokeWidth={2.5} />
+                                            </button>
+
+                                            {/* Send or Record Voice Note */}
+                                            {(editingId ? editContent : content).trim() ? (
+                                                <button
+                                                    onClick={editingId ? handleEdit : () => handleSend()}
+                                                    className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-black text-white rounded-full transition-all hover:opacity-70 active:scale-95 shadow-lg"
+                                                >
+                                                    {editingId ? (
+                                                        <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={3} />
+                                                    ) : (
+                                                        <Send className="w-4 h-4 md:w-5 md:h-5" />
+                                                    )}
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={startRecording}
+                                                    disabled={isUploading}
+                                                    className={`w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-[#FEF9C3] text-black rounded-full transition-all hover:bg-yellow-200 active:scale-95 shadow-md ${isUploading ? 'opacity-20' : 'opacity-100'}`}
+                                                    title="Record Voice Note"
+                                                >
+                                                    <Mic className="w-5 h-5 md:w-6 md:h-6" strokeWidth={2.5} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
@@ -753,6 +887,14 @@ const MessageItem = memo(({
                                             />
                                         </div>
                                     </div>
+                                ) : msg.fileType === 'audio' ? (
+                                    <div className={`min-w-[200px] md:min-w-[250px] p-1 ${msg.isMe ? 'text-white' : 'text-zinc-900'}`}>
+                                        <audio
+                                            controls
+                                            className={`w-full h-10 md:h-12 ${msg.isMe ? 'filter invert' : ''} opacity-90`}
+                                            src={msg.fileUrl || ""}
+                                        />
+                                    </div>
                                 ) : (
                                     <div
                                         className={`flex items-center gap-3 p-3 rounded-md border ${msg.isMe ? 'bg-white/40 border-black/5 text-zinc-900' : 'bg-white border-zinc-100 text-zinc-800'} backdrop-blur-sm shadow-sm`}
@@ -788,125 +930,125 @@ const MessageItem = memo(({
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                     </div>
                 )}
+            </div>
 
-                {/* Reaction Display - Refined Style & Positioning */}
-                {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
-                    <div
-                        onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
-                        className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
-                    >
-                        {msg.reactionCounts.map(({ emoji, count }: { emoji: string, count: number }) => (
-                            <div key={emoji} className="flex items-center gap-1">
-                                <span className="text-[12px] leading-none">{emoji}</span>
-                                <span className="text-[10px] font-black text-yellow-600 md:text-yellow-500">{count}</span>
-                            </div>
-                        ))}
-                    </div>
-                )}
+            {/* Reaction Display - Refined Style & Positioning */}
+            {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
+                <div
+                    onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
+                    className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
+                >
+                    {msg.reactionCounts.map(({ emoji, count }: { emoji: string, count: number }) => (
+                        <div key={emoji} className="flex items-center gap-1">
+                            <span className="text-[12px] leading-none">{emoji}</span>
+                            <span className="text-[10px] font-black text-yellow-600 md:text-yellow-500">{count}</span>
+                        </div>
+                    ))}
+                </div>
+            )}
 
-                {/* Action Menu Trigger (Smile Icon on Hover) */}
-                {!msg.isDeleted && (
+            {/* Action Menu Trigger (Smile Icon on Hover) */}
+            {!msg.isDeleted && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
+                    }}
+                    className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
+                >
+                    <Smile className="w-5 h-5 text-black" />
+                </button>
+            )}
+
+            {/* Reaction Popover (Whatsapp Style) */}
+            {!msg.isDeleted && activeReactionMessageId === msg._id && (
+                <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
+                    {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
+                        <button
+                            key={emoji}
+                            onClick={() => {
+                                toggleReaction({ messageId: msg._id, emoji });
+                                setActiveReactionMessageId(null);
+                            }}
+                            className={`p-1 md:p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
+                        >
+                            <span className="text-base md:text-xl">{emoji}</span>
+                        </button>
+                    ))}
+                    <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
-                        }}
-                        className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
+                        onClick={() => onReply(msg)}
+                        className="p-1 md:p-1.5 text-emerald-500/50 md:text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all"
+                        title="Reply"
                     >
-                        <Smile className="w-5 h-5 text-black" />
+                        <CornerUpLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
-                )}
-
-                {/* Reaction Popover (Whatsapp Style) */}
-                {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                    <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
-                        {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
-                            <button
-                                key={emoji}
-                                onClick={() => {
-                                    toggleReaction({ messageId: msg._id, emoji });
-                                    setActiveReactionMessageId(null);
-                                }}
-                                className={`p-1 md:p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
-                            >
-                                <span className="text-base md:text-xl">{emoji}</span>
-                            </button>
-                        ))}
-                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
+                    {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
                         <button
-                            onClick={() => onReply(msg)}
-                            className="p-1 md:p-1.5 text-emerald-500/50 md:text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all"
-                            title="Reply"
+                            onClick={() => onEdit(msg._id, msg.content)}
+                            className="p-1 md:p-1.5 text-yellow-600/50 md:text-zinc-400 hover:text-yellow-600 active:text-yellow-600 transition-all"
+                            title="Edit Message"
                         >
-                            <CornerUpLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
-                        {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
-                            <button
-                                onClick={() => onEdit(msg._id, msg.content)}
-                                className="p-1 md:p-1.5 text-yellow-600/50 md:text-zinc-400 hover:text-yellow-600 active:text-yellow-600 transition-all"
-                                title="Edit Message"
-                            >
-                                <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </button>
-                        )}
-                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
-                        {msg.isMe ? (
-                            <button
-                                onClick={() => {
-                                    deleteMessage({ messageId: msg._id });
-                                    setActiveReactionMessageId(null);
-                                }}
-                                className="p-1 md:p-1.5 text-red-500/50 md:text-zinc-400 hover:text-red-500 active:text-red-500 transition-all"
-                                title="Delete for Everyone"
-                            >
-                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => {
-                                    setHiddenMessageIds((prev: any) => {
-                                        const next = new Set(prev);
-                                        next.add(msg._id);
-                                        return next;
-                                    });
-                                    setActiveReactionMessageId(null);
-                                }}
-                                className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
-                                title="Hide for Me"
-                            >
-                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </button>
-                        )}
-                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
-                        <button
-                            onClick={() => setActiveReactionMessageId(null)}
-                            className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
-                            title="Close"
-                        >
-                            <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        </button>
-                    </div>
-                )}
-            </div>
-            <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
-                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
-                    {formatMessageTime(msg._creationTime)}
-                    {msg.isEdited && (
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">(edited)</span>
                     )}
-                </span>
-                {msg.isMe && !msg.isDeleted && (
-                    <div className="flex items-center">
-                        {msg.readByAll ? (
-                            <CheckCheck className="w-3.5 h-3.5 text-blue-500" strokeWidth={3} />
-                        ) : msg.deliveredAt ? (
-                            <CheckCheck className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
-                        ) : (
-                            <Check className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
-                        )}
-                    </div>
+                    <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
+                    {msg.isMe ? (
+                        <button
+                            onClick={() => {
+                                deleteMessage({ messageId: msg._id });
+                                setActiveReactionMessageId(null);
+                            }}
+                            className="p-1 md:p-1.5 text-red-500/50 md:text-zinc-400 hover:text-red-500 active:text-red-500 transition-all"
+                            title="Delete for Everyone"
+                        >
+                            <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                setHiddenMessageIds((prev: any) => {
+                                    const next = new Set(prev);
+                                    next.add(msg._id);
+                                    return next;
+                                });
+                                setActiveReactionMessageId(null);
+                            }}
+                            className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
+                            title="Hide for Me"
+                        >
+                            <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        </button>
+                    )}
+                    <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
+                    <button
+                        onClick={() => setActiveReactionMessageId(null)}
+                        className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
+                        title="Close"
+                    >
+                        <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    </button>
+                </div>
+            )}
+        </div>
+        <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
+            <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
+                {formatMessageTime(msg._creationTime)}
+                {msg.isEdited && (
+                    <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">(edited)</span>
                 )}
-            </div>
+            </span>
+            {msg.isMe && !msg.isDeleted && (
+                <div className="flex items-center">
+                    {msg.readByAll ? (
+                        <CheckCheck className="w-3.5 h-3.5 text-blue-500" strokeWidth={3} />
+                    ) : msg.deliveredAt ? (
+                        <CheckCheck className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+                    ) : (
+                        <Check className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+                    )}
+                </div>
+            )}
         </div>
     </div>
 ));
