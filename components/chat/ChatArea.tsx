@@ -811,7 +811,7 @@ const MessageItem = memo(({
                 <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
                     {formatMessageTime(msg._creationTime)}
                     {msg.isEdited && (
-                        <span className="text-[8px] font-black text-blue-400 uppercase tracking-tighter">(edited)</span>
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">(edited)</span>
                     )}
                 </span>
                 {msg.isMe && !msg.isDeleted && (
