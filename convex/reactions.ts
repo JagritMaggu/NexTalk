@@ -13,6 +13,11 @@ export const toggleReaction = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Unauthorized");
 
+        const message = await ctx.db.get(messageId);
+        if (!message || message.isDeleted) {
+            throw new Error("Cannot react to a deleted message");
+        }
+
         // Validate emoji is in the allowed set
         if (!ALLOWED_EMOJIS.includes(emoji)) {
             throw new Error("Invalid emoji");

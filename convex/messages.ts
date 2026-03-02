@@ -187,6 +187,16 @@ export const deleteMessage = mutation({
 
         // Soft delete — keep the record, just mark it
         await ctx.db.patch(messageId, { isDeleted: true });
+
+        // Delete all reactions linked to this message when it is deleted
+        const reactions = await ctx.db
+            .query("reactions")
+            .withIndex("by_messageId", (q) => q.eq("messageId", messageId))
+            .collect();
+
+        for (const reaction of reactions) {
+            await ctx.db.delete(reaction._id);
+        }
     },
 });
 

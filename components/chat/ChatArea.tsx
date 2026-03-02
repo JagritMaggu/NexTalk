@@ -768,7 +768,7 @@ const MessageItem = memo(({
                 )}
 
                 {/* Reaction Display - Refined Style & Positioning */}
-                {msg.reactionCounts && msg.reactionCounts.length > 0 && (
+                {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
                     <div
                         onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
                         className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
