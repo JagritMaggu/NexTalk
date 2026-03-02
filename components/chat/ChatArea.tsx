@@ -463,22 +463,21 @@ const ActiveChat = memo(function ActiveChat({
                             )}
 
                             {replyingTo && (
-                                <div className="absolute bottom-full left-0 w-full mb-4 bg-white/95 backdrop-blur-xl border border-zinc-100 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-3xl flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-3">
-                                    <div className="w-1.5 bg-black" />
-                                    <div className="flex-1 flex items-center gap-4 py-4 px-4 overflow-hidden">
-                                        <div className="p-2.5 bg-zinc-100 rounded-xl flex-shrink-0">
-                                            <CornerUpLeft className="w-4 h-4 text-black" strokeWidth={2.5} />
-                                        </div>
-                                        <div className="flex flex-col min-w-0">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-900 mb-0.5">Replying to {replyingTo.sender?.name}</span>
-                                            <p className="text-sm text-zinc-500 line-clamp-1 font-medium italic opacity-80 leading-tight">"{replyingTo.content}"</p>
-                                        </div>
+                                <div className="absolute bottom-full left-0 w-full mb-3 bg-white/95 backdrop-blur-xl border border-zinc-100 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.05)] rounded-2xl flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
+                                    <div className="w-1 bg-black" />
+                                    <div className="flex-1 flex flex-col justify-center py-2 px-4 overflow-hidden">
+                                        <span className="text-[11px] font-black text-black leading-tight truncate mb-0.5">
+                                            {replyingTo.sender?.name}
+                                        </span>
+                                        <p className="text-[13px] text-zinc-500 line-clamp-1 font-medium leading-normal opacity-80">
+                                            {replyingTo.content}
+                                        </p>
                                     </div>
                                     <button
                                         onClick={() => setReplyingTo(null)}
-                                        className="self-center p-2 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all flex-shrink-0"
+                                        className="self-center p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all flex-shrink-0"
                                     >
-                                        <X className="w-5 h-5" />
+                                        <X className="w-4 h-4 font-black" />
                                     </button>
                                 </div>
                             )}
