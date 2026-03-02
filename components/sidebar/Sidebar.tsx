@@ -21,12 +21,14 @@ import {
     Inbox,
     Plus,
     Check,
-    CheckCheck
+    CheckCheck,
+    Pin,
+    PinOff
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import CreateGroupModal from "./CreateGroupModal";
 
-const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, me }: any) => {
+const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, me }: any) => {
     const isGroup = conv.isGroup;
     const displayName = isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
     const displayImage = isGroup ? conv.groupImage : conv.otherParticipants?.[0]?.image;
@@ -70,6 +72,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                 <div className="flex items-center justify-between mb-0.5">
                     <span className={`truncate text-xs md:text-sm flex items-center gap-2 ${conv.unreadCount > 0 ? 'font-black text-yellow-600 md:text-[#FEF9C3]' : 'font-bold text-black md:text-white'}`}>
                         {displayName}
+                        {isPinned && <Pin className="w-3 h-3 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
                         {isGroup && (
                             <span className="text-[8px] px-1.5 py-0.5 bg-zinc-100 md:bg-white/10 text-zinc-500 md:text-zinc-400 rounded-sm font-black uppercase tracking-tighter">
                                 {conv.participantIds?.length} members
@@ -90,6 +93,16 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                             title={isArchived ? "Unarchive chat" : "Archive chat"}
                         >
                             <Archive className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onTogglePin();
+                            }}
+                            className={`p-1 rounded-full transition-all ${isPinned ? 'text-[#FACC15] md:text-[#FEF9C3]' : 'text-zinc-500 hover:text-zinc-400'}`}
+                            title={isPinned ? "Unpin chat" : "Pin chat"}
+                        >
+                            {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                         </button>
                         <button
                             onClick={(e) => {
@@ -236,6 +249,15 @@ export const Sidebar = memo(function Sidebar({
     const allUsers = useQuery(api.users.getAllUsers);
     const me = useQuery(api.users.getMe);
     const createOrGetConversation = useMutation(api.conversations.createOrGetConversation);
+    const togglePinMutation = useMutation(api.conversations.togglePinConversation);
+
+    const togglePin = async (id: Id<"conversations">) => {
+        try {
+            await togglePinMutation({ conversationId: id });
+        } catch (err) {
+            console.error("Failed to pin conversation:", err);
+        }
+    };
 
     const toggleStar = (id: string) => {
         setStarredIds(prev => {
@@ -322,6 +344,10 @@ export const Sidebar = memo(function Sidebar({
 
         // Sort Order
         return [...valid].sort((a, b) => {
+            // Pinned chats always stay on top
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+
             const aTime = a.lastMessage?._creationTime || a._creationTime;
             const bTime = b.lastMessage?._creationTime || b._creationTime;
             return sortOrder === "Newest" ? bTime - aTime : aTime - bTime;
@@ -515,6 +541,8 @@ export const Sidebar = memo(function Sidebar({
                                         isStarred={starredIds.has(conv._id)}
                                         onToggleArchive={() => toggleArchive(conv._id)}
                                         isArchived={archivedIds.has(conv._id)}
+                                        onTogglePin={() => togglePin(conv._id)}
+                                        isPinned={conv.isPinned}
                                         me={me}
                                     />
                                 ))

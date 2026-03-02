@@ -129,16 +129,22 @@ export const getMyConversations = query({
                     unreadCount,
                     userRole: member.role || "member",
                     ownerId: conversation.ownerId,
+                    isPinned: member.isPinned || false,
                 };
             })
         );
 
-        // Filter out nulls and sort by last message time (newest first)
+        // Filter out nulls and sort: Pinned first (by pinnedAt or creation), then others by last message time
         return conversationsWithDetails
-            .filter(Boolean)
+            .filter((c): c is NonNullable<typeof c> => c !== null)
             .sort((a, b) => {
-                const aTime = a!.lastMessage?._creationTime ?? a!._creationTime;
-                const bTime = b!.lastMessage?._creationTime ?? b!._creationTime;
+                // If one is pinned and other is not, pinned wins
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+
+                // If both are pinned or both are not, sort by time
+                const aTime = a.lastMessage?._creationTime ?? a._creationTime;
+                const bTime = b.lastMessage?._creationTime ?? b._creationTime;
                 return bTime - aTime;
             });
     },
@@ -494,5 +500,36 @@ export const addGroupMembers = mutation({
         await ctx.db.patch(conversationId, {
             participantIds: finalParticipantIds
         });
+    },
+});
+
+export const togglePinConversation = mutation({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Unauthorized");
+
+        const currentUser = await ctx.db
+            .query("users")
+            .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+            .unique();
+        if (!currentUser) throw new Error("User not found");
+
+        const member = await ctx.db
+            .query("conversationMembers")
+            .withIndex("by_conversationId_userId", (q) =>
+                q.eq("conversationId", conversationId).eq("userId", currentUser._id)
+            )
+            .unique();
+
+        if (!member) throw new Error("Not a member of this conversation");
+
+        const isPinned = !member.isPinned;
+        await ctx.db.patch(member._id, {
+            isPinned,
+            pinnedAt: isPinned ? Date.now() : undefined,
+        });
+
+        return { isPinned };
     },
 });

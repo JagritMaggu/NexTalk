@@ -323,3 +323,46 @@ export const getSharedMedia = query({
         );
     },
 });
+
+export const togglePinMessage = mutation({
+    args: { messageId: v.id("messages") },
+    handler: async (ctx, { messageId }) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Unauthorized");
+
+        const currentUser = await ctx.db
+            .query("users")
+            .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+            .unique();
+        if (!currentUser) throw new Error("User not found");
+
+        const message = await ctx.db.get(messageId);
+        if (!message) throw new Error("Message not found");
+
+        const conversation = await ctx.db.get(message.conversationId);
+        if (!conversation || !conversation.participantIds.includes(currentUser._id)) {
+            throw new Error("Not a participant in this conversation");
+        }
+
+        const isPinned = !message.isPinned;
+        await ctx.db.patch(messageId, {
+            isPinned,
+            pinnedAt: isPinned ? Date.now() : undefined,
+        });
+
+        return { isPinned };
+    },
+});
+
+export const getPinnedMessages = query({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
+        const messages = await ctx.db
+            .query("messages")
+            .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
+            .filter((q) => q.eq(q.field("isPinned"), true))
+            .collect();
+
+        return messages.sort((a, b) => (b.pinnedAt || 0) - (a.pinnedAt || 0));
+    },
+});

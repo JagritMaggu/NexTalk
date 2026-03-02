@@ -42,6 +42,8 @@ export default defineSchema({
         isEdited: v.optional(v.boolean()),   // Feature: Message Editing
         editedAt: v.optional(v.number()),    // Feature: Message Editing
         parentMessageId: v.optional(v.id("messages")), // Feature: Quoted Replies
+        isPinned: v.optional(v.boolean()),      // Feature: Pinning Messages
+        pinnedAt: v.optional(v.number()),      // Feature: Pinning Messages
     })
         .index("by_conversationId", ["conversationId"]),
 
@@ -72,6 +74,8 @@ export default defineSchema({
         userId: v.id("users"),
         lastSeenMessageId: v.optional(v.id("messages")), // for unread count (Feature 9)
         role: v.optional(v.string()),                  // "owner" | "admin" | "member"
+        isPinned: v.optional(v.boolean()),             // Feature: Pinned Chats
+        pinnedAt: v.optional(v.number()),              // Feature: Pinned Chats
     })
         .index("by_conversationId", ["conversationId"])
         .index("by_userId", ["userId"])
