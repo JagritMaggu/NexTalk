@@ -695,13 +695,17 @@ const MessageItem = memo(({
                             el?.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
                             setTimeout(() => el?.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
                         }}
-                        className={`-mx-4.5 -mt-2.5 mb-2.5 p-3 rounded-t-[inherit] border-b cursor-pointer transition-all hover:opacity-80 flex flex-col gap-0.5 ${msg.isMe ? 'bg-white/10 border-white/5 text-white/70' : 'bg-black/5 border-black/5 text-black/50'}`}
+                        className={`-mx-4.5 -mt-2.5 mb-2.5 bg-zinc-700 border-b border-white/5 cursor-pointer transition-all hover:opacity-90 flex items-stretch overflow-hidden rounded-t-[inherit]`}
                     >
-                        <div className="font-black text-[10px] uppercase tracking-[0.15em] flex items-center gap-2">
-                            <div className={`w-1 h-3 rounded-full ${msg.isMe ? 'bg-white/40' : 'bg-black/20'}`} />
-                            {msg.parentMessage.senderName}
+                        <div className="w-1 bg-yellow-500 flex-shrink-0" />
+                        <div className="flex-1 flex flex-col justify-center py-2 px-3 overflow-hidden">
+                            <span className="text-[10px] font-black text-yellow-500 tracking-wider leading-tight truncate mb-0.5 uppercase">
+                                {msg.parentMessage.senderName}
+                            </span>
+                            <p className="text-[11px] text-zinc-100 line-clamp-1 font-medium leading-tight opacity-90">
+                                {msg.parentMessage.content}
+                            </p>
                         </div>
-                        <p className="text-[12px] line-clamp-1 italic px-3 font-medium opacity-90">{msg.parentMessage.content}</p>
                     </div>
                 )}
 
