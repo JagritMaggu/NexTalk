@@ -116,11 +116,11 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                 {conv.lastMessage && conv.lastMessage.senderId === me?._id && !conv.isDeleted && (
                                     <div className="flex-shrink-0">
                                         {conv.lastMessage.readByAll ? (
-                                            <CheckCheck className="w-3.5 h-3.5 text-green-500" />
+                                            <CheckCheck className="w-3.5 h-3.5 text-blue-500" strokeWidth={3} />
                                         ) : conv.lastMessage.deliveredAt ? (
-                                            <CheckCheck className="w-3.5 h-3.5 text-zinc-400" />
+                                            <CheckCheck className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
                                         ) : (
-                                            <Check className="w-3.5 h-3.5 text-zinc-400" />
+                                            <Check className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
                                         )}
                                     </div>
                                 )}
