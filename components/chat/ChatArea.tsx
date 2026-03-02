@@ -58,6 +58,7 @@ const ActiveChat = memo(function ActiveChat({
     const [editingId, setEditingId] = useState<Id<"messages"> | null>(null);
     const [editContent, setEditContent] = useState("");
     const [replyingTo, setReplyingTo] = useState<any | null>(null);
+    const isFirstLoad = useRef(true);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -96,10 +97,27 @@ const ActiveChat = memo(function ActiveChat({
         }
     }, [conversationId, messages, markAsRead]);
 
+    // Reset first load when conversation changes
+    useEffect(() => {
+        isFirstLoad.current = true;
+    }, [conversationId]);
+
     // Smart Auto-Scroll
     useEffect(() => {
         if (!scrollContainerRef.current) return;
         const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+
+        // Force immediate scroll to bottom on first load of messages
+        if (messages !== undefined && isFirstLoad.current) {
+            isFirstLoad.current = false;
+            if (messages.length > 0) {
+                setTimeout(() => {
+                    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+                }, 50);
+            }
+            return;
+        }
+
         const isAtBottom = scrollHeight - scrollTop - clientHeight < 150;
 
         if (isAtBottom) {
