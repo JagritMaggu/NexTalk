@@ -16,6 +16,8 @@ import {
     ChevronDown,
     UserPlus,
     PlusCircle,
+    X,
+    Archive,
     Inbox,
     Plus,
     Check,
