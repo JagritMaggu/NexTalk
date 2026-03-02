@@ -832,7 +832,7 @@ const MessageItem = memo(({
             </div>
         )}
 
-        <div className={`relative flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+        <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
             {(!msg.isMe && isGroup) && (
                 <span className="text-[10px] font-bold text-zinc-500 mb-1 ml-1 tracking-tight">
                     {msg.sender?.name}
@@ -930,107 +930,106 @@ const MessageItem = memo(({
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                     </div>
                 )}
-            </div>
 
-
-            {/* Reaction Display - Refined Style & Positioning */}
-            {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
-                <div
-                    onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
-                    className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
-                >
-                    {msg.reactionCounts.map(({ emoji, count }: { emoji: string, count: number }) => (
-                        <div key={emoji} className="flex items-center gap-1">
-                            <span className="text-[12px] leading-none">{emoji}</span>
-                            <span className="text-[10px] font-black text-yellow-600 md:text-yellow-500">{count}</span>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Action Menu Trigger (Smile Icon on Hover) */}
-            {!msg.isDeleted && (
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
-                    }}
-                    className={`absolute ${msg.isMe ? '-left-10 md:-left-8' : '-right-10 md:-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
-                >
-                    <Smile className="w-5 h-5 transition-colors" />
-                </button>
-            )}
-
-            {/* Reaction Popover (Whatsapp Style) */}
-            {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                <div className={`absolute top-full mt-1 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
-                    {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
-                        <button
-                            key={emoji}
-                            onClick={() => {
-                                toggleReaction({ messageId: msg._id, emoji });
-                                setActiveReactionMessageId(null);
-                            }}
-                            className={`p-1 md:p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
-                        >
-                            <span className="text-base md:text-xl">{emoji}</span>
-                        </button>
-                    ))}
-                    <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
-                    <button
-                        onClick={() => onReply(msg)}
-                        className="p-1 md:p-1.5 text-emerald-500/50 md:text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all"
-                        title="Reply"
+                {/* Reaction Display - Refined Style & Positioning */}
+                {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
+                    <div
+                        onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
+                        className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
                     >
-                        <CornerUpLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        {msg.reactionCounts.map(({ emoji, count }: { emoji: string; count: number }) => (
+                            <div key={emoji} className="flex items-center gap-1">
+                                <span className="text-[12px] leading-none">{emoji}</span>
+                                <span className="text-[10px] font-black text-yellow-600 md:text-yellow-500">{count}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Action Menu Trigger (Smile Icon on Hover) */}
+                {!msg.isDeleted && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
+                        }}
+                        className={`absolute ${msg.isMe ? '-left-10 md:-left-8' : '-right-10 md:-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
+                    >
+                        <Smile className="w-5 h-5 transition-colors" />
                     </button>
-                    {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
+                )}
+
+                {/* Reaction Popover (Whatsapp Style) */}
+                {!msg.isDeleted && activeReactionMessageId === msg._id && (
+                    <div className={`absolute top-full mt-1 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
+                        {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
+                            <button
+                                key={emoji}
+                                onClick={() => {
+                                    toggleReaction({ messageId: msg._id, emoji });
+                                    setActiveReactionMessageId(null);
+                                }}
+                                className={`p-1 md:p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
+                            >
+                                <span className="text-base md:text-xl">{emoji}</span>
+                            </button>
+                        ))}
+                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         <button
-                            onClick={() => onEdit(msg._id, msg.content)}
-                            className="p-1 md:p-1.5 text-yellow-600/50 md:text-zinc-400 hover:text-yellow-600 active:text-yellow-600 transition-all"
-                            title="Edit Message"
+                            onClick={() => onReply(msg)}
+                            className="p-1 md:p-1.5 text-emerald-500/50 md:text-zinc-400 hover:text-emerald-500 active:text-emerald-500 transition-all"
+                            title="Reply"
                         >
-                            <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            <CornerUpLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
-                    )}
-                    <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
-                    {msg.isMe ? (
+                        {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
+                            <button
+                                onClick={() => onEdit(msg._id, msg.content)}
+                                className="p-1 md:p-1.5 text-yellow-600/50 md:text-zinc-400 hover:text-yellow-600 active:text-yellow-600 transition-all"
+                                title="Edit Message"
+                            >
+                                <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </button>
+                        )}
+                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
+                        {msg.isMe ? (
+                            <button
+                                onClick={() => {
+                                    deleteMessage({ messageId: msg._id });
+                                    setActiveReactionMessageId(null);
+                                }}
+                                className="p-1 md:p-1.5 text-red-500/50 md:text-zinc-400 hover:text-red-500 active:text-red-500 transition-all"
+                                title="Delete for Everyone"
+                            >
+                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    setHiddenMessageIds((prev: any) => {
+                                        const next = new Set(prev);
+                                        next.add(msg._id);
+                                        return next;
+                                    });
+                                    setActiveReactionMessageId(null);
+                                }}
+                                className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
+                                title="Hide for Me"
+                            >
+                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </button>
+                        )}
+                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         <button
-                            onClick={() => {
-                                deleteMessage({ messageId: msg._id });
-                                setActiveReactionMessageId(null);
-                            }}
-                            className="p-1 md:p-1.5 text-red-500/50 md:text-zinc-400 hover:text-red-500 active:text-red-500 transition-all"
-                            title="Delete for Everyone"
-                        >
-                            <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => {
-                                setHiddenMessageIds((prev: any) => {
-                                    const next = new Set(prev);
-                                    next.add(msg._id);
-                                    return next;
-                                });
-                                setActiveReactionMessageId(null);
-                            }}
+                            onClick={() => setActiveReactionMessageId(null)}
                             className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
-                            title="Hide for Me"
+                            title="Close"
                         >
-                            <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
-                    )}
-                    <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
-                    <button
-                        onClick={() => setActiveReactionMessageId(null)}
-                        className="p-1 md:p-1.5 text-zinc-500/50 md:text-zinc-400 hover:text-black active:text-black transition-all"
-                        title="Close"
-                    >
-                        <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    </button>
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
             <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
                 <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
                     {formatMessageTime(msg._creationTime)}
