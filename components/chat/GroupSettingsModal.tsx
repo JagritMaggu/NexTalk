@@ -158,7 +158,7 @@ export default function GroupSettingsModal({ isOpen, onClose, conversationId }: 
                 {/* Header */}
                 <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-zinc-900">
                     <h2 className="text-xl font-black tracking-tight text-white">Group Settings</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-zinc-900 rounded-md transition-colors text-zinc-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 transition-colors text-zinc-400 hover:text-white">
                         <X className="w-5 h-5" />
                     </button>
                 </div>

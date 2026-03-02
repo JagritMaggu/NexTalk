@@ -325,7 +325,7 @@ const ActiveChat = memo(function ActiveChat({
                                 className="bg-transparent border-none outline-none text-xs font-medium text-white w-32 md:w-48 placeholder:text-zinc-600"
                                 onKeyDown={(e) => e.key === 'Escape' && setIsSearching(false)}
                             />
-                            <button onClick={() => { setIsSearching(false); setSearchQuery(""); }} className="p-1 hover:bg-white/10 rounded-md transition-colors text-zinc-500 hover:text-white">
+                            <button onClick={() => { setIsSearching(false); setSearchQuery(""); }} className="p-1 text-zinc-500 hover:text-white transition-colors">
                                 <X className="w-3.5 h-3.5" />
                             </button>
                         </div>
@@ -475,7 +475,7 @@ const ActiveChat = memo(function ActiveChat({
                                     </div>
                                     <button
                                         onClick={() => setReplyingTo(null)}
-                                        className="self-center p-1.5 hover:bg-white/10 text-zinc-400 hover:text-white rounded-full transition-all flex-shrink-0"
+                                        className="self-center p-1.5 text-zinc-500 hover:text-white transition-all flex-shrink-0"
                                     >
                                         <X className="w-4 h-4" strokeWidth={2.5} />
                                     </button>
@@ -498,9 +498,9 @@ const ActiveChat = memo(function ActiveChat({
                                             setEditingId(null);
                                             setEditContent("");
                                         }}
-                                        className="p-1.5 hover:bg-yellow-400/20 rounded-full transition-colors"
+                                        className="p-1.5 text-yellow-700/50 hover:text-yellow-800 transition-colors"
                                     >
-                                        <X className="w-4 h-4 text-yellow-700" />
+                                        <X className="w-4 h-4" />
                                     </button>
                                 </div>
                             )}
@@ -606,7 +606,7 @@ const AssetPreviewModal = ({ url, showDownload, onClose }: { url: string; showDo
         >
             <button
                 onClick={onClose}
-                className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 text-white rounded-md transition-all border border-white/10 z-[210]"
+                className="absolute top-8 right-8 p-3 text-white/50 hover:text-white transition-all z-[210]"
             >
                 <X className="w-6 h-6" />
             </button>
