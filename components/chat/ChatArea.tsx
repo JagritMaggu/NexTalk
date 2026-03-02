@@ -423,7 +423,7 @@ const ActiveChat = memo(function ActiveChat({
                                         </span>
                                     )}
                                     <div className="bg-[#FEF9C3] text-yellow-800 px-4 py-2.5 rounded-[24px] rounded-tl-[4px] shadow-sm flex items-center gap-1.5 border border-yellow-200/50">
-                                        <span className="text-[11px] font-black uppercase tracking-[0.15em]">typing</span>
+                                        <span className="text-[10px] font-bold italic tracking-tight">typing</span>
                                         <div className="flex gap-0.5 items-center">
                                             <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
                                             <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
