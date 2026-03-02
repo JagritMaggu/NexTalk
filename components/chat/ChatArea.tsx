@@ -794,7 +794,7 @@ const MessageItem = memo(({
 
                 {/* Reaction Popover (Whatsapp Style) */}
                 {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                    <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white border border-zinc-100 p-2 rounded-md transition-all animate-in fade-in zoom-in-95 duration-200 z-50`}>
+                    <div className={`absolute top-full mt-2 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
                         {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
                             <button
                                 key={emoji}
@@ -802,39 +802,39 @@ const MessageItem = memo(({
                                     toggleReaction({ messageId: msg._id, emoji });
                                     setActiveReactionMessageId(null);
                                 }}
-                                className={`p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
+                                className={`p-1 md:p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
                             >
-                                <span className="text-xl">{emoji}</span>
+                                <span className="text-base md:text-xl">{emoji}</span>
                             </button>
                         ))}
-                        <div className="w-px h-4 bg-zinc-100 mx-1" />
+                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         <button
                             onClick={() => onReply(msg)}
-                            className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                            className="p-1 md:p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
                             title="Reply"
                         >
-                            <CornerUpLeft className="w-4 h-4" />
+                            <CornerUpLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
                         {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
                             <button
                                 onClick={() => onEdit(msg._id, msg.content)}
-                                className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                                className="p-1 md:p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
                                 title="Edit Message"
                             >
-                                <Edit2 className="w-4 h-4" />
+                                <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                             </button>
                         )}
-                        <div className="w-px h-4 bg-zinc-100 mx-1" />
+                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         {msg.isMe ? (
                             <button
                                 onClick={() => {
                                     deleteMessage({ messageId: msg._id });
                                     setActiveReactionMessageId(null);
                                 }}
-                                className="p-1.5 hover:bg-red-50 text-red-500 rounded-full transition-all"
+                                className="p-1 md:p-1.5 hover:bg-red-50 text-red-500 rounded-full transition-all"
                                 title="Delete for Everyone"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                             </button>
                         ) : (
                             <button
@@ -846,19 +846,19 @@ const MessageItem = memo(({
                                     });
                                     setActiveReactionMessageId(null);
                                 }}
-                                className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                                className="p-1 md:p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
                                 title="Hide for Me"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                             </button>
                         )}
-                        <div className="w-px h-4 bg-zinc-100 mx-1" />
+                        <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         <button
                             onClick={() => setActiveReactionMessageId(null)}
-                            className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                            className="p-1 md:p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
                             title="Close"
                         >
-                            <X className="w-4 h-4" />
+                            <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
                     </div>
                 )}
