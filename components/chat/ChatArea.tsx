@@ -463,21 +463,21 @@ const ActiveChat = memo(function ActiveChat({
                             )}
 
                             {replyingTo && (
-                                <div className="absolute bottom-full left-0 w-full mb-3 bg-zinc-900 border border-zinc-800 shadow-2xl rounded-2xl flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
-                                    <div className="w-1.5 bg-yellow-500" />
-                                    <div className="flex-1 flex flex-col justify-center py-3 px-4 overflow-hidden">
-                                        <span className="text-[11px] font-black text-yellow-500 tracking-wider leading-tight truncate mb-1 uppercase">
+                                <div className="absolute bottom-full left-0 w-full mb-3 bg-zinc-700 rounded-lg flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
+                                    <div className="w-1 bg-yellow-500" />
+                                    <div className="flex-1 flex flex-col justify-center py-2 px-4 overflow-hidden">
+                                        <span className="text-[11px] font-black text-yellow-500 tracking-wider leading-tight truncate mb-0.5 uppercase">
                                             {replyingTo.sender?.name}
                                         </span>
-                                        <p className="text-[13px] text-zinc-300 line-clamp-1 font-medium leading-normal opacity-90">
+                                        <p className="text-[12px] text-zinc-100 line-clamp-1 font-medium leading-normal opacity-90">
                                             {replyingTo.content}
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => setReplyingTo(null)}
-                                        className="self-center p-2 hover:bg-white/5 text-zinc-500 hover:text-white rounded-full transition-all flex-shrink-0"
+                                        className="self-center p-1.5 hover:bg-white/10 text-zinc-400 hover:text-white rounded-full transition-all flex-shrink-0"
                                     >
-                                        <X className="w-4 h-4" strokeWidth={3} />
+                                        <X className="w-4 h-4" strokeWidth={2.5} />
                                     </button>
                                 </div>
                             )}
