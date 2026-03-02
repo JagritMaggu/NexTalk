@@ -37,6 +37,8 @@ export default defineSchema({
         fileStorageId: v.optional(v.id("_storage")),
         fileUrl: v.optional(v.string()),
         fileType: v.optional(v.string()), // 'image', 'file', etc.
+        deliveredAt: v.optional(v.number()), // Feature: Read Receipts
+        seenAt: v.optional(v.number()),      // Feature: Read Receipts
     })
         .index("by_conversationId", ["conversationId"]),
 

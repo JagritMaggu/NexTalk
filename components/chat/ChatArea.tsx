@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -583,7 +583,7 @@ const MessageItem = memo(({
     <div className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative`}>
         {(!msg.isMe && isGroup) && (
             <div className="flex-shrink-0 mb-1">
-                <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-zinc-100">
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-100">
                     {msg.sender?.image ? (
                         <img src={msg.sender?.image} className="w-full h-full object-cover" alt="" />
                     ) : (
@@ -602,7 +602,7 @@ const MessageItem = memo(({
                 </span>
             )}
             <div className={`relative px-4.5 py-2.5 text-[14px] md:text-[15px] font-medium leading-normal ${msg.isMe
-                ? 'bg-[#F3F4F6] text-[#111827] rounded-[24px] rounded-tr-[8px]'
+                ? 'bg-black text-white rounded-[24px] rounded-tr-[8px]'
                 : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
                 } ${msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : ''} transition-all`}>
 
@@ -688,7 +688,7 @@ const MessageItem = memo(({
                         }}
                         className={`absolute ${msg.isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
                     >
-                        <Smile className="w-5 h-5" />
+                        <Smile className="w-5 h-5 text-black" />
                     </button>
                 )}
 
@@ -746,9 +746,22 @@ const MessageItem = memo(({
                     </div>
                 )}
             </div>
-            <span className={`text-[9px] font-bold text-zinc-500 px-1 tracking-widest uppercase opacity-80 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-2'}`}>
-                {formatMessageTime(msg._creationTime)}
-            </span>
+            <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
+                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80">
+                    {formatMessageTime(msg._creationTime)}
+                </span>
+                {msg.isMe && !msg.isDeleted && (
+                    <div className="flex items-center">
+                        {msg.readByAll ? (
+                            <CheckCheck className="w-3.5 h-3.5 text-blue-500" strokeWidth={3} />
+                        ) : msg.deliveredAt ? (
+                            <CheckCheck className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+                        ) : (
+                            <Check className="w-3.5 h-3.5 text-zinc-400" strokeWidth={3} />
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     </div>
 ));

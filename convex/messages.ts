@@ -38,6 +38,7 @@ export const sendMessage = mutation({
             isDeleted: false,
             fileStorageId,
             fileType,
+            deliveredAt: Date.now(),
         });
 
         // Update conversation's lastMessageId for sidebar preview
@@ -87,7 +88,13 @@ export const getMessages = query({
             .order("asc")
             .collect();
 
-        // Enrich messages with sender details and reactions
+        // Fetch all members of this conversation once
+        const members = await ctx.db
+            .query("conversationMembers")
+            .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
+            .collect();
+
+        // Enrich messages with sender details, reactions, and read status
         const enrichedMessages = await Promise.all(
             messages.map(async (message) => {
                 const sender = await ctx.db.get(message.senderId);
@@ -119,6 +126,23 @@ export const getMessages = query({
                     fileUrl = await ctx.storage.getUrl(message.fileStorageId);
                 }
 
+                // Calculate read status (WhatsApp-style)
+                // For a message to be "readByAll", every other participant must have seen it
+                let readByAll = false;
+                if (message.senderId === currentUser._id) {
+                    const otherMembers = members.filter(m => m.userId !== currentUser._id);
+                    if (otherMembers.length > 0) {
+                        const readReceipts = await Promise.all(
+                            otherMembers.map(async (m) => {
+                                if (!m.lastSeenMessageId) return false;
+                                const lastSeen = await ctx.db.get(m.lastSeenMessageId);
+                                return lastSeen && lastSeen._creationTime >= message._creationTime;
+                            })
+                        );
+                        readByAll = readReceipts.every(r => r === true);
+                    }
+                }
+
                 return {
                     ...message,
                     sender,
@@ -126,6 +150,7 @@ export const getMessages = query({
                     myReactions,
                     fileUrl,
                     isMe: message.senderId === currentUser._id,
+                    readByAll,
                 };
             })
         );
