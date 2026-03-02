@@ -463,7 +463,7 @@ const ActiveChat = memo(function ActiveChat({
                             )}
 
                             {replyingTo && (
-                                <div className="absolute bottom-full left-0 w-full mb-3 bg-zinc-700 rounded-lg flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
+                                <div className="absolute bottom-full left-0 w-full mb-3 bg-zinc-800 rounded-lg flex items-stretch overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-40 pr-2">
                                     <div className="w-1 bg-yellow-500" />
                                     <div className="flex-1 flex flex-col justify-center py-2 px-4 overflow-hidden">
                                         <span className="text-[11px] font-black text-yellow-500 tracking-wider leading-tight truncate mb-0.5 uppercase">
@@ -695,7 +695,7 @@ const MessageItem = memo(({
                             el?.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
                             setTimeout(() => el?.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
                         }}
-                        className={`-mx-4.5 -mt-2.5 mb-2.5 bg-zinc-700 border-b border-white/5 cursor-pointer transition-all hover:opacity-90 flex items-stretch overflow-hidden rounded-t-[inherit]`}
+                        className={`-mx-4.5 -mt-2.5 mb-2.5 bg-zinc-800 border-b border-white/5 cursor-pointer transition-all hover:opacity-90 flex items-stretch overflow-hidden rounded-t-[inherit]`}
                     >
                         <div className="w-1 bg-yellow-500 flex-shrink-0" />
                         <div className="flex-1 flex flex-col justify-center py-2 px-3 overflow-hidden">
