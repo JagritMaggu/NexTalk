@@ -1,4 +1,3 @@
-```
 "use client";
 
 import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote, Mic, StopCircle, Square, Pin } from "lucide-react";
@@ -248,7 +247,7 @@ const ActiveChat = memo(function ActiveChat({
             const article = ['a', 'e', 'i', 'o', 'u'].includes(contentLabel[0].toLowerCase()) ? 'an' : 'a';
 
             await handleSend({
-                content: `Sent ${ article } ${ contentLabel } `,
+                content: `Sent ${article} ${contentLabel} `,
                 fileStorageId: storageId,
                 fileType: detectedType
             });
@@ -340,7 +339,7 @@ const ActiveChat = memo(function ActiveChat({
     const formatDuration = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${ mins }:${ secs.toString().padStart(2, '0') } `;
+        return `${mins}:${secs.toString().padStart(2, '0')} `;
     };
 
     const onInputChange = (val: string) => {
@@ -387,7 +386,7 @@ const ActiveChat = memo(function ActiveChat({
                             <div className="relative group">
                                 <div
                                     onClick={() => displayImage && setPreviewAsset({ url: displayImage, showDownload: false })}
-                                    className={`w - 10 h - 10 md: w - 11 md: h - 11 rounded - full overflow - hidden transition - all bg - transparent ${ displayImage ? 'cursor-pointer' : '' } `}
+                                    className={`w-10 h-10 md:w-11 md:h-11 rounded-full overflow-hidden transition-all bg-transparent ${displayImage ? 'cursor-pointer' : ''}`}
                                 >
                                     {displayImage ? (
                                         <img src={displayImage} className="w-full h-full object-cover" alt="" />
@@ -414,13 +413,13 @@ const ActiveChat = memo(function ActiveChat({
                                                 <span className="w-1 h-1 bg-current rounded-full animate-bounce" />
                                             </span>
                                             {isGroup
-                                                ? `${ typingUsers.map(u => u?.name?.split(' ')[0]).join(', ') } ${ typingUsers.length > 1 ? 'are' : 'is' } typing...`
+                                                ? `${typingUsers.map(u => u?.name?.split(' ')[0]).join(', ')} ${typingUsers.length > 1 ? 'are' : 'is'} typing...`
                                                 : 'typing...'
                                             }
                                         </span>
                                     ) : (
-                                        <span className={`text - [9px] font - bold uppercase tracking - widest ${ isOnline ? 'text-green-500' : 'text-zinc-400' } `}>
-                                            {isGroup ? `${ conversation?.participantIds?.length } members` : (isOnline ? 'Online' : 'Offline')}
+                                        <span className={`text-[9px] font-bold uppercase tracking-widest ${isOnline ? 'text-green-500' : 'text-zinc-400'}`}>
+                                            {isGroup ? `${conversation?.participantIds?.length} members` : (isOnline ? 'Online' : 'Offline')}
                                         </span>
                                     )}
                                 </div>
@@ -472,7 +471,7 @@ const ActiveChat = memo(function ActiveChat({
                 <div
                     ref={scrollContainerRef}
                     onScroll={handleScroll}
-                    className={`flex - 1 overflow - y - auto px - 6 md: px - 20 pt - 10 pb - 4 md: pb - 10 no - scrollbar relative ${ isRecording ? 'blur-sm grayscale' : '' } ${ pinnedMessages && pinnedMessages.length > 0 ? 'pt-20' : '' } `}
+                    className={`flex-1 overflow-y-auto px-6 md:px-20 pt-10 pb-4 md:pb-10 no-scrollbar relative ${isRecording ? 'blur-sm grayscale' : ''} ${pinnedMessages && pinnedMessages.length > 0 ? 'pt-20' : ''}`}
                 >
                     {showNewMessageButton && (
                         <button
@@ -755,7 +754,7 @@ const ActiveChat = memo(function ActiveChat({
                                             {/* Smile Button */}
                                             <button
                                                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                                className={`p - 1.5 rounded - full transition - all text - zinc - 800 hover: bg - zinc - 200 / 50 ${ showEmojiPicker ? 'bg-zinc-200' : '' } `}
+                                                className={`p-1.5 rounded-full transition-all text-zinc-800 hover:bg-zinc-200/50 ${showEmojiPicker ? 'bg-zinc-200' : ''}`}
                                             >
                                                 <Smile className="w-5 h-5 md:w-6 md:h-6" strokeWidth={2.5} />
                                             </button>
@@ -784,7 +783,7 @@ const ActiveChat = memo(function ActiveChat({
                                                 <button
                                                     onClick={startRecording}
                                                     disabled={isUploading}
-                                                    className={`w - 10 h - 10 md: w - 11 md: h - 11 flex items - center justify - center bg - [#FEF9C3] text - black rounded - full transition - all hover: bg - yellow - 200 active: scale - 95 shadow - md ${ isUploading ? 'opacity-20' : 'opacity-100' } `}
+                                                    className={`w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-[#FEF9C3] text-black rounded-full transition-all hover:bg-yellow-200 active:scale-95 shadow-md ${isUploading ? 'opacity-20' : 'opacity-100'}`}
                                                     title="Record Voice Note"
                                                 >
                                                     <Mic className="w-5 h-5 md:w-6 md:h-6" strokeWidth={2.5} />
@@ -882,7 +881,7 @@ const MessageItem = memo(({
     onEdit: (msgId: Id<"messages">, content: string) => void;
     onReply: (msg: any) => void;
 }) => (
-    <div id={msg._id} className={`flex items - end gap - 3 ${ msg.isMe ? 'flex-row-reverse' : 'flex-row' } animate - fade -in group relative scroll - mt - 20`}>
+    <div id={msg._id} className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative scroll-mt-20`}>
         {(!msg.isMe && isGroup) && (
             <div className="flex-shrink-0 mb-1">
                 <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-100">
@@ -897,7 +896,7 @@ const MessageItem = memo(({
             </div>
         )}
 
-        <div className={`flex flex - col ${ msg.isMe ? 'items-end' : 'items-start' } max - w - [85 %] md: max - w - [70 %]`}>
+        <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
             {msg.isPinned && (
                 <div className="flex items-center gap-1 mb-1 animate-in zoom-in-50 duration-300 px-1">
                     <Pin className="w-2.5 h-2.5 text-indigo-500 fill-current" />
@@ -909,11 +908,10 @@ const MessageItem = memo(({
                     {msg.sender?.name}
                 </span>
             )}
-            <div className={`relative px - 4.5 py - 2.5 text - [14px] md: text - [15px] font - medium leading - normal ${
-    msg.isMe
-        ? 'bg-black text-white rounded-[24px] rounded-tr-[8px]'
-        : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
-} ${ msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : '' } transition - all`}>
+            <div className={`relative px-4.5 py-2.5 text-[14px] md:text-[15px] font-medium leading-normal ${msg.isMe
+                ? 'bg-black text-white rounded-[24px] rounded-tr-[8px]'
+                : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
+                } ${msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : ''} transition-all`}>
 
                 {msg.parentMessage && !msg.isDeleted && (
                     <div
@@ -923,7 +921,7 @@ const MessageItem = memo(({
                             el?.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
                             setTimeout(() => el?.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
                         }}
-                        className={`- mx - 4.5 - mt - 2.5 mb - 2.5 bg - zinc - 800 border - b border - white / 5 cursor - pointer transition - all hover: opacity - 90 flex items - stretch overflow - hidden rounded - t - [inherit]`}
+                        className={`-mx-4.5 -mt-2.5 mb-2.5 bg-zinc-800 border-b border-white/5 cursor-pointer transition-all hover:opacity-90 flex items-stretch overflow-hidden rounded-t-[inherit]`}
                     >
                         <div className="w-1 bg-yellow-500 flex-shrink-0" />
                         <div className="flex-1 flex flex-col justify-center py-2 px-3 overflow-hidden">
@@ -960,16 +958,16 @@ const MessageItem = memo(({
                                         </div>
                                     </div>
                                 ) : msg.fileType === 'audio' ? (
-                                    <div className={`min - w - [200px] md: min - w - [250px] p - 1 ${ msg.isMe ? 'text-white' : 'text-zinc-900' } `}>
+                                    <div className={`min-w-[200px] md:min-w-[250px] p-1 ${msg.isMe ? 'text-white' : 'text-zinc-900'}`}>
                                         <audio
                                             controls
-                                            className={`w - full h - 10 md: h - 12 ${ msg.isMe ? 'filter invert' : '' } opacity - 90`}
+                                            className={`w-full h-10 md:h-12 ${msg.isMe ? 'filter invert' : ''} opacity-90`}
                                             src={msg.fileUrl || ""}
                                         />
                                     </div>
                                 ) : (
                                     <div
-                                        className={`flex items - center gap - 3 p - 3 rounded - md border ${ msg.isMe ? 'bg-white/40 border-black/5 text-zinc-900' : 'bg-white border-zinc-100 text-zinc-800' } backdrop - blur - sm shadow - sm`}
+                                        className={`flex items-center gap-3 p-3 rounded-md border ${msg.isMe ? 'bg-white/40 border-black/5 text-zinc-900' : 'bg-white border-zinc-100 text-zinc-800'} backdrop-blur-sm shadow-sm`}
                                     >
                                         <div className="flex-1 min-w-0 px-1 text-left flex items-center gap-3">
                                             <div className="p-2 bg-zinc-100 rounded-md text-zinc-500">
@@ -1007,7 +1005,7 @@ const MessageItem = memo(({
                 {!msg.isDeleted && msg.reactionCounts && msg.reactionCounts.length > 0 && (
                     <div
                         onClick={() => setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id)}
-                        className={`absolute - bottom - 5 ${ msg.isMe ? 'right-2' : 'left-2' } m - 1 flex items - center gap - 1.5 bg - zinc - 50 border border - zinc - 200 / 60 px - 2 py - 1 rounded - lg z - 20 transition - all hover: bg - zinc - 100 hover: opacity - 90 cursor - pointer group / rx`}
+                        className={`absolute -bottom-5 ${msg.isMe ? 'right-2' : 'left-2'} m-1 flex items-center gap-1.5 bg-zinc-50 border border-zinc-200/60 px-2 py-1 rounded-lg z-20 transition-all hover:bg-zinc-100 hover:opacity-90 cursor-pointer group/rx`}
                     >
                         {msg.reactionCounts.map(({ emoji, count }: { emoji: string; count: number }) => (
                             <div key={emoji} className="flex items-center gap-1">
@@ -1025,7 +1023,7 @@ const MessageItem = memo(({
                             e.stopPropagation();
                             setActiveReactionMessageId(activeReactionMessageId === msg._id ? null : msg._id);
                         }}
-                        className={`absolute ${ msg.isMe ? '-left-10 md:-left-8' : '-right-10 md:-right-8' } top - 1 / 2 - translate - y - 1 / 2 p - 1.5 text - zinc - 500 md: text - zinc - 300 hover: text - black transition - all opacity - 100 md: opacity - 0 md: group - hover: opacity - 100 z - 10`}
+                        className={`absolute ${msg.isMe ? '-left-10 md:-left-8' : '-right-10 md:-right-8'} top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 md:text-zinc-300 hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10`}
                     >
                         <Smile className="w-5 h-5 transition-colors" />
                     </button>
@@ -1033,7 +1031,7 @@ const MessageItem = memo(({
 
                 {/* Reaction Popover (Whatsapp Style) */}
                 {!msg.isDeleted && activeReactionMessageId === msg._id && (
-                    <div className={`absolute top - full mt - 1 ${ msg.isMe ? 'right-0' : 'left-0' } flex items - center gap - 0.5 md: gap - 1 bg - white border border - zinc - 100 p - 1 md: p - 2 rounded - xl transition - all animate -in fade -in zoom -in -95 duration - 200 z - 50 shadow - xl`}>
+                    <div className={`absolute top-full mt-1 ${msg.isMe ? 'right-0' : 'left-0'} flex items-center gap-0.5 md:gap-1 bg-white border border-zinc-100 p-1 md:p-2 rounded-xl transition-all animate-in fade-in zoom-in-95 duration-200 z-50 shadow-xl`}>
                         {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(emoji => (
                             <button
                                 key={emoji}
@@ -1041,7 +1039,7 @@ const MessageItem = memo(({
                                     toggleReaction({ messageId: msg._id, emoji });
                                     setActiveReactionMessageId(null);
                                 }}
-                                className={`p - 1 md: p - 1.5 hover: bg - zinc - 50 rounded - full transition - all ${ msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : '' } `}
+                                className={`p-1 md:p-1.5 hover:bg-zinc-50 rounded-full transition-all ${msg.myReactions?.includes(emoji) ? 'bg-indigo-50' : ''}`}
                             >
                                 <span className="text-base md:text-xl">{emoji}</span>
                             </button>
@@ -1068,10 +1066,10 @@ const MessageItem = memo(({
                                 togglePinMessage({ messageId: msg._id });
                                 setActiveReactionMessageId(null);
                             }}
-                            className={`p - 1 md: p - 1.5 transition - all ${ msg.isPinned ? 'text-indigo-500' : 'text-zinc-500/50 md:text-zinc-400 hover:text-indigo-500' } `}
+                            className={`p-1 md:p-1.5 transition-all ${msg.isPinned ? 'text-indigo-500' : 'text-zinc-500/50 md:text-zinc-400 hover:text-indigo-500'}`}
                             title={msg.isPinned ? "Unpin" : "Pin Message"}
                         >
-                            <Pin className={`w - 3.5 h - 3.5 md: w - 4 md: h - 4 ${ msg.isPinned ? 'fill-current' : '' } `} />
+                            <Pin className={`w-3.5 h-3.5 md:w-4 md:h-4 ${msg.isPinned ? 'fill-current' : ''}`} />
                         </button>
                         <div className="w-px h-4 bg-zinc-100 mx-0.5 md:mx-1" />
                         {msg.isMe ? (
@@ -1112,7 +1110,7 @@ const MessageItem = memo(({
                     </div>
                 )}
             </div>
-            <div className={`flex items - center gap - 1.5 ${ msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1' } px - 1`}>
+            <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
                 <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
                     {formatMessageTime(msg._creationTime)}
                     {msg.isEdited && (
@@ -1137,10 +1135,10 @@ const MessageItem = memo(({
 MessageItem.displayName = "MessageItem";
 
 const MessageSkeleton = ({ isMe, isGroup }: { isMe: boolean; isGroup: boolean }) => (
-    <div className={`flex items - start gap - 4 ${ isMe ? 'flex-row-reverse' : 'flex-row' } `}>
+    <div className={`flex items-start gap-4 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
         {(isGroup && !isMe) && <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-zinc-100/50 animate-pulse flex-shrink-0 mt-1" />}
-        <div className={`flex flex - col ${ isMe ? 'items-end' : 'items-start' } flex - 1`}>
-            <div className={`w - [60 %] h - 14 rounded - 2xl animate - pulse ${ isMe ? 'bg-zinc-100' : 'bg-zinc-50' } `} />
+        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} flex-1`}>
+            <div className={`w-[60%] h-14 rounded-2xl animate-pulse ${isMe ? 'bg-zinc-100' : 'bg-zinc-50'}`} />
             <div className="w-16 h-2.5 bg-zinc-50 rounded mt-3 opacity-50" />
         </div>
     </div>
