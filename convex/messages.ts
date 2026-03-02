@@ -173,6 +173,48 @@ export const deleteMessage = mutation({
     },
 });
 
+// Edit a message (Feature: Controlled Window)
+export const editMessage = mutation({
+    args: {
+        messageId: v.id("messages"),
+        newContent: v.string(),
+    },
+    handler: async (ctx, { messageId, newContent }) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Unauthorized");
+
+        const currentUser = await ctx.db
+            .query("users")
+            .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+            .unique();
+        if (!currentUser) throw new Error("User not found");
+
+        const message = await ctx.db.get(messageId);
+        if (!message) throw new Error("Message not found");
+
+        // Safety checks
+        if (message.senderId !== currentUser._id) {
+            throw new Error("Cannot edit another user's message");
+        }
+        if (message.isDeleted) {
+            throw new Error("Cannot edit a deleted message");
+        }
+
+        // Window check: Only within 5 minutes (300,000 ms)
+        const fiveMinutes = 5 * 60 * 1000;
+        const now = Date.now();
+        if (now - message._creationTime > fiveMinutes) {
+            throw new Error("Editing window (5 mins) has expired");
+        }
+
+        await ctx.db.patch(messageId, {
+            content: newContent.trim(),
+            isEdited: true,
+            editedAt: now,
+        });
+    },
+});
+
 // Mark a conversation as read (clears unread count - Feature 9)
 export const markConversationAsRead = mutation({
     args: { conversationId: v.id("conversations") },

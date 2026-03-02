@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -55,6 +55,8 @@ const ActiveChat = memo(function ActiveChat({
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [editingId, setEditingId] = useState<Id<"messages"> | null>(null);
+    const [editContent, setEditContent] = useState("");
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -72,6 +74,7 @@ const ActiveChat = memo(function ActiveChat({
     const toggleReaction = useMutation(api.reactions.toggleReaction);
     const setTyping = useMutation(api.typing.setTyping);
     const clearTyping = useMutation(api.typing.clearTyping);
+    const editMessage = useMutation(api.messages.editMessage);
 
     const isGroup = conversation?.isGroup;
     const displayName = isGroup ? conversation.groupName : (conversation?.otherParticipants?.[0] as any)?.name;
@@ -164,6 +167,17 @@ const ActiveChat = memo(function ActiveChat({
             if (!overrides?.fileStorageId) setContent(currentContent);
         }
     }, [content, conversationId, sendMessage, clearTyping]);
+
+    const handleEdit = async () => {
+        if (!editingId || !editContent.trim()) return;
+        try {
+            await editMessage({ messageId: editingId, newContent: editContent });
+            setEditingId(null);
+            setEditContent("");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to edit message");
+        }
+    };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -378,6 +392,11 @@ const ActiveChat = memo(function ActiveChat({
                                     setHiddenMessageIds={setHiddenMessageIds}
                                     setPreviewAsset={setPreviewAsset}
                                     formatMessageTime={formatMessageTime}
+                                    onEdit={(msgId: Id<"messages">, content: string) => {
+                                        setEditingId(msgId);
+                                        setEditContent(content);
+                                        setActiveReactionMessageId(null);
+                                    }}
                                 />
                             ));
                         }, [messages, filteredMessages, hiddenMessageIds, activeReactionMessageId, isGroup, typingUsers, toggleReaction, deleteMessage, setHiddenMessageIds, setPreviewAsset, formatMessageTime])}
@@ -433,6 +452,29 @@ const ActiveChat = memo(function ActiveChat({
                                             {emoji}
                                         </button>
                                     ))}
+                                </div>
+                            )}
+
+                            {editingId && (
+                                <div className="absolute bottom-full left-0 w-full mb-3 p-3 bg-[#FEF9C3] border border-yellow-200 shadow-lg rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-bottom-2 z-40">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-yellow-400/20 rounded-full">
+                                            <Edit2 className="w-3.5 h-3.5 text-yellow-700" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-800">Editing Message</span>
+                                            <p className="text-xs text-yellow-700/80 line-clamp-1 italic">"{messages?.find(m => m._id === editingId)?.content}"</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setEditingId(null);
+                                            setEditContent("");
+                                        }}
+                                        className="p-1.5 hover:bg-yellow-400/20 rounded-full transition-colors"
+                                    >
+                                        <X className="w-4 h-4 text-yellow-700" />
+                                    </button>
                                 </div>
                             )}
 
@@ -569,6 +611,7 @@ const MessageItem = memo(({
     setHiddenMessageIds,
     setPreviewAsset,
     formatMessageTime,
+    onEdit,
 }: {
     msg: any;
     isGroup: boolean;
@@ -579,6 +622,7 @@ const MessageItem = memo(({
     setHiddenMessageIds: any;
     setPreviewAsset: any;
     formatMessageTime: any;
+    onEdit: (msgId: Id<"messages">, content: string) => void;
 }) => (
     <div className={`flex items-end gap-3 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} animate-fade-in group relative`}>
         {(!msg.isMe && isGroup) && (
@@ -707,6 +751,15 @@ const MessageItem = memo(({
                                 <span className="text-xl">{emoji}</span>
                             </button>
                         ))}
+                        {msg.isMe && !msg.isDeleted && (Date.now() - msg._creationTime < 5 * 60 * 1000) && (
+                            <button
+                                onClick={() => onEdit(msg._id, msg.content)}
+                                className="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-black rounded-full transition-all"
+                                title="Edit Message"
+                            >
+                                <Edit2 className="w-4 h-4" />
+                            </button>
+                        )}
                         <div className="w-px h-4 bg-zinc-100 mx-1" />
                         {msg.isMe ? (
                             <button
@@ -747,8 +800,11 @@ const MessageItem = memo(({
                 )}
             </div>
             <div className={`flex items-center gap-1.5 ${msg.reactionCounts && msg.reactionCounts.length > 0 ? 'mt-4' : 'mt-1'} px-1`}>
-                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80">
+                <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase opacity-80 flex items-center gap-1.5">
                     {formatMessageTime(msg._creationTime)}
+                    {msg.isEdited && (
+                        <span className="text-[8px] font-black text-blue-400 uppercase tracking-tighter">(edited)</span>
+                    )}
                 </span>
                 {msg.isMe && !msg.isDeleted && (
                     <div className="flex items-center">

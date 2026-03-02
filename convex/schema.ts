@@ -39,6 +39,8 @@ export default defineSchema({
         fileType: v.optional(v.string()), // 'image', 'file', etc.
         deliveredAt: v.optional(v.number()), // Feature: Read Receipts
         seenAt: v.optional(v.number()),      // Feature: Read Receipts
+        isEdited: v.optional(v.boolean()),   // Feature: Message Editing
+        editedAt: v.optional(v.number()),    // Feature: Message Editing
     })
         .index("by_conversationId", ["conversationId"]),
 
