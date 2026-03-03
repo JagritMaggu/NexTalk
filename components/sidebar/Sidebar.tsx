@@ -32,7 +32,7 @@ import { UserButton } from "@clerk/nextjs";
 import { toast } from "sonner";
 import CreateGroupModal from "./CreateGroupModal";
 
-const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, onToggleBlock, onDelete, me }: any) => {
+const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, onToggleBlock, isBlocked, onDelete, me }: any) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isGroup = conv.isGroup;
     const displayName = isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
@@ -85,25 +85,27 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                 <div className="flex items-center justify-between mb-0.5">
                     <span className={`truncate text-xs md:text-sm flex items-center gap-2 ${conv.unreadCount > 0 ? 'font-black text-yellow-600 md:text-[#FEF9C3]' : 'font-bold text-black md:text-white'}`}>
                         {displayName}
-                        <div className="flex items-center gap-1">
-                            {isPinned && <Pin className="w-3 h-3 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
-                            {isStarred && <Star className="w-3 h-3 text-accent-star fill-current" />}
-                            {isArchived && <Archive className="w-3 h-3 text-indigo-400" />}
-                        </div>
                         {isGroup && (
                             <span className="text-[8px] px-1.5 py-0.5 bg-zinc-100 md:bg-white/10 text-zinc-500 md:text-zinc-400 rounded-sm font-black uppercase tracking-tighter">
                                 {conv.participantIds?.length} members
                             </span>
                         )}
                     </span>
-                    <div className="flex items-center gap-2 relative">
+                    <div className="flex items-center gap-1.5 relative">
+                        {/* Status Indicators */}
+                        <div className="flex items-center gap-1 opacity-70">
+                            {isPinned && <Pin className="w-2.5 h-2.5 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
+                            {isStarred && <Star className="w-2.5 h-2.5 text-accent-star fill-current" />}
+                            {isArchived && <Archive className="w-2.5 h-2.5 text-indigo-400" />}
+                            {isBlocked && <Ban className="w-2.5 h-2.5 text-red-500" />}
+                        </div>
                         {/* More Button */}
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setIsMenuOpen(!isMenuOpen);
                             }}
-                            className={`p-1.5 rounded-full transition-all flex items-center justify-center ${isMenuOpen ? 'bg-zinc-200 md:bg-white/10 text-black md:text-white' : 'text-zinc-600 md:text-zinc-500 hover:bg-zinc-100 md:hover:bg-white/5 hover:text-black md:hover:text-white'}`}
+                            className={`transition-colors flex items-center justify-center ${isMenuOpen ? 'text-black md:text-white' : 'text-zinc-600 md:text-zinc-500 hover:text-black md:hover:text-white'}`}
                         >
                             <MoreVertical className="w-4 h-4" />
                         </button>
@@ -284,18 +286,20 @@ const BlockedItem = ({ user, onUnblock, onPreviewImage }: any) => (
             </div>
             <div className="text-left">
                 <p className="font-bold text-black md:text-white text-xs md:text-sm">{user.name}</p>
-                <p className="text-[8px] font-black uppercase tracking-widest text-red-500/60">Blocked</p>
             </div>
         </div>
-        <button
-            onClick={(e) => {
-                e.stopPropagation();
-                onUnblock();
-            }}
-            className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-white hover:bg-white/10 transition-all border border-zinc-200 md:border-white/10"
-        >
-            Unblock
-        </button>
+        <div className="flex items-center gap-3">
+            <Ban className="w-2.5 h-2.5 text-red-500 opacity-70" />
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onUnblock();
+                }}
+                className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FEF9C3] text-black hover:bg-[#FACC15] transition-colors"
+            >
+                Unblock
+            </button>
+        </div>
     </div>
 );
 
@@ -704,6 +708,7 @@ export const Sidebar = memo(function Sidebar({
                                                 const otherId = conv.participantIds.find((id: any) => id !== me?._id);
                                                 if (otherId) toggleBlock(otherId);
                                             }}
+                                            isBlocked={blockedUserIds.has(conv.participantIds.find((id: any) => id !== me?._id))}
                                             onDelete={() => handleDeleteChat(conv._id)}
                                             me={me}
                                         />
