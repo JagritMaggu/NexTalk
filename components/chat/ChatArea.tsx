@@ -730,7 +730,7 @@ const ActiveChat = memo(function ActiveChat({
                             {blockStatus.blockedByMe && blockStatus.otherUserId && (
                                 <button
                                     onClick={() => toggleBlockMutation({ userId: blockStatus.otherUserId as any })}
-                                    className="mt-4 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+                                    className="mt-4 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] transition-all"
                                 >
                                     Unblock
                                 </button>

@@ -93,11 +93,11 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                     </span>
                     <div className="flex items-center gap-1.5 relative">
                         {/* Status Indicators */}
-                        <div className="flex items-center gap-1 opacity-70">
-                            {isPinned && <Pin className="w-2.5 h-2.5 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
-                            {isStarred && <Star className="w-2.5 h-2.5 text-accent-star fill-current" />}
-                            {isArchived && <Archive className="w-2.5 h-2.5 text-indigo-400" />}
-                            {isBlocked && <Ban className="w-2.5 h-2.5 text-red-500" />}
+                        <div className="flex items-center gap-2 opacity-70">
+                            {isPinned && <Pin className="w-3.5 h-3.5 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
+                            {isStarred && <Star className="w-3.5 h-3.5 text-accent-star fill-current" />}
+                            {isArchived && <Archive className="w-3.5 h-3.5 text-indigo-400" />}
+                            {isBlocked && <Ban className="w-3.5 h-3.5 text-red-500" />}
                         </div>
                         {/* More Button */}
                         <button
