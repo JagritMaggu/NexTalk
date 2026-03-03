@@ -295,7 +295,7 @@ const BlockedItem = ({ user, onUnblock, onPreviewImage }: any) => (
                     e.stopPropagation();
                     onUnblock();
                 }}
-                className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#FEF9C3] text-black hover:bg-[#FACC15] transition-colors"
+                className="px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest bg-[#FEF9C3] text-black hover:bg-[#FACC15] transition-colors"
             >
                 Unblock
             </button>
