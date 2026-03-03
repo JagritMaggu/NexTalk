@@ -467,11 +467,33 @@ const ActiveChat = memo(function ActiveChat({
             </div>
 
             <div className="flex-1 bg-white rounded-t-[40px] md:rounded-none flex flex-col overflow-hidden">
+                {/* Pinned Messages Bar - stays sticky above scroll, like WhatsApp */}
+                {pinnedMessages && pinnedMessages.length > 0 && (
+                    <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 px-5 py-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <Pin className="w-4 h-4 text-[#FEF9C3] fill-current flex-shrink-0" />
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                            <p className="text-xs font-medium text-white/70 truncate">
+                                {pinnedMessages[0].content || (pinnedMessages[0].fileType === 'audio' ? "Audio Clip" : pinnedMessages[0].fileType === 'image' ? "Image" : "Shared File")}
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                const el = document.getElementById(pinnedMessages[0]._id);
+                                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                el?.classList.add('ring-4', 'ring-yellow-400/30', 'rounded-2xl');
+                                setTimeout(() => el?.classList.remove('ring-4', 'ring-yellow-400/30'), 2000);
+                            }}
+                            className="text-[9px] font-black text-[#FEF9C3] uppercase tracking-widest hover:text-yellow-300 transition-colors flex-shrink-0"
+                        >
+                            View
+                        </button>
+                    </div>
+                )}
                 {/* ─── MESSAGES ─── */}
                 <div
                     ref={scrollContainerRef}
                     onScroll={handleScroll}
-                    className={`flex-1 overflow-y-auto px-6 md:px-20 pt-10 pb-4 md:pb-10 no-scrollbar relative ${isRecording ? 'blur-sm grayscale' : ''} ${pinnedMessages && pinnedMessages.length > 0 ? 'pt-20' : ''}`}
+                    className={`flex-1 overflow-y-auto px-6 md:px-20 pt-10 pb-4 md:pb-10 no-scrollbar relative ${isRecording ? 'blur-sm grayscale' : ''}`}
                 >
                     {showNewMessageButton && (
                         <button
@@ -513,29 +535,6 @@ const ActiveChat = memo(function ActiveChat({
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    )}
-
-                    {/* Pinned Messages Bar */}
-                    {pinnedMessages && pinnedMessages.length > 0 && (
-                        <div className="absolute top-0 left-0 right-0 z-[50] bg-[#0b141b] border-b border-white/10 px-4 py-2 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
-                            <Pin className="w-3.5 h-3.5 text-indigo-400 fill-current flex-shrink-0" />
-                            <div className="flex-1 min-w-0 overflow-hidden">
-                                <p className="text-xs font-medium text-white/80 truncate">
-                                    {pinnedMessages[0].content || (pinnedMessages[0].fileType === 'audio' ? "Audio Clip" : pinnedMessages[0].fileType === 'image' ? "Image" : "Shared File")}
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    const el = document.getElementById(pinnedMessages[0]._id);
-                                    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    el?.classList.add('ring-4', 'ring-indigo-500/20', 'rounded-2xl');
-                                    setTimeout(() => el?.classList.remove('ring-4', 'ring-indigo-500/20'), 2000);
-                                }}
-                                className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:text-indigo-300 transition-colors flex-shrink-0"
-                            >
-                                View
-                            </button>
                         </div>
                     )}
 
@@ -898,8 +897,8 @@ const MessageItem = memo(({
         <div className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
             {msg.isPinned && (
                 <div className="flex items-center gap-1 mb-1 animate-in zoom-in-50 duration-300 px-1">
-                    <Pin className="w-2.5 h-2.5 text-indigo-500 fill-current" />
-                    <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest">Pinned</span>
+                    <Pin className="w-2.5 h-2.5 text-yellow-500 fill-current" />
+                    <span className="text-[8px] font-black text-yellow-500 uppercase tracking-widest">Pinned</span>
                 </div>
             )}
             {(!msg.isMe && isGroup) && (
