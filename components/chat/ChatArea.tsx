@@ -1146,7 +1146,7 @@ const MessageItem = memo(({
                                 togglePinMessage({ messageId: msg._id });
                                 setActiveReactionMessageId(null);
                             }}
-                            className={`p-1 md:p-1.5 transition-all ${msg.isPinned ? 'text-indigo-500' : 'text-zinc-500/50 md:text-zinc-400 hover:text-indigo-500'}`}
+                            className={`p-1 md:p-1.5 transition-all ${msg.isPinned ? 'text-yellow-500' : 'text-zinc-500/50 md:text-zinc-400 hover:text-yellow-500'}`}
                             title={msg.isPinned ? "Unpin" : "Pin Message"}
                         >
                             <Pin className={`w-3.5 h-3.5 md:w-4 md:h-4 ${msg.isPinned ? 'fill-current' : ''}`} />

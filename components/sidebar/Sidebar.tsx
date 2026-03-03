@@ -29,6 +29,7 @@ import { UserButton } from "@clerk/nextjs";
 import CreateGroupModal from "./CreateGroupModal";
 
 const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, me }: any) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isGroup = conv.isGroup;
     const displayName = isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
     const displayImage = isGroup ? conv.groupImage : conv.otherParticipants?.[0]?.image;
@@ -36,10 +37,18 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
 
     const typingUsers = useQuery(api.typing.getTypingUsers, { conversationId: conv._id });
 
+    // Close menu on outside click
+    useEffect(() => {
+        if (!isMenuOpen) return;
+        const close = () => setIsMenuOpen(false);
+        window.addEventListener('click', close);
+        return () => window.removeEventListener('click', close);
+    }, [isMenuOpen]);
+
     return (
         <div
             onClick={onClick}
-            className={`flex items-center gap-3 w-full p-3.5 rounded-3xl md:rounded-none transition-all cursor-pointer ${isSelected
+            className={`flex items-center gap-3 w-full p-3.5 rounded-3xl md:rounded-none transition-all cursor-pointer group/item relative ${isSelected
                 ? 'bg-zinc-50 md:bg-white/5'
                 : 'hover:bg-zinc-50/50 md:hover:bg-white/[0.02]'
                 }`}
@@ -79,40 +88,57 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                             </span>
                         )}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 relative">
+                        {/* More Button */}
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onToggleArchive();
+                                setIsMenuOpen(!isMenuOpen);
                             }}
-                            className={`flex p-1.5 rounded-full transition-all 
-                                    ${isArchived
-                                    ? 'text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20'
-                                    : 'text-zinc-400 hover:text-indigo-400 hover:bg-indigo-500/5'}
-                                `}
-                            title={isArchived ? "Unarchive chat" : "Archive chat"}
+                            className={`p-1.5 rounded-full transition-all text-zinc-500 hover:text-white hover:bg-white/10 flex items-center justify-center ${isMenuOpen ? 'opacity-100 bg-white/10' : 'opacity-0 group-hover/item:opacity-100'}`}
                         >
-                            <Archive className="w-3.5 h-3.5" />
+                            <MoreVertical className="w-4 h-4" />
                         </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onTogglePin();
-                            }}
-                            className={`p-1 rounded-full transition-all ${isPinned ? 'text-[#FACC15] md:text-[#FEF9C3]' : 'text-zinc-500 hover:text-zinc-400'}`}
-                            title={isPinned ? "Unpin chat" : "Pin chat"}
-                        >
-                            {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onToggleStar();
-                            }}
-                            className={`p-1 rounded-full transition-all ${isStarred ? 'text-accent-star' : 'text-zinc-500 hover:text-zinc-400'}`}
-                        >
-                            <Star className={`w-4 h-4 ${isStarred ? 'fill-current' : ''}`} />
-                        </button>
+
+                        {/* Dropdown Menu */}
+                        {isMenuOpen && (
+                            <div className="absolute top-full right-0 mt-1 w-32 bg-white md:bg-[#1e2329] border border-zinc-100 md:border-white/10 rounded-xl shadow-2xl py-1 z-[100] animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onTogglePin();
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider text-zinc-500 md:text-zinc-400 hover:bg-zinc-50 md:hover:bg-white/5 flex items-center gap-2 transition-colors"
+                                >
+                                    {isPinned ? <PinOff className="w-3.5 h-3.5" /> : <Pin className="w-3.5 h-3.5" />}
+                                    <span>{isPinned ? 'Unpin' : 'Pin'}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleStar();
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition-colors hover:bg-zinc-50 md:hover:bg-white/5 ${isStarred ? 'text-accent-star' : 'text-zinc-500 md:text-zinc-400'}`}
+                                >
+                                    <Star className={`w-3.5 h-3.5 ${isStarred ? 'fill-current' : ''}`} />
+                                    <span>{isStarred ? 'Unstar' : 'Star'}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleArchive();
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition-colors hover:bg-zinc-50 md:hover:bg-white/5 ${isArchived ? 'text-indigo-400' : 'text-zinc-500 md:text-zinc-400'}`}
+                                >
+                                    <Archive className="w-3.5 h-3.5" />
+                                    <span>{isArchived ? 'Unarchive' : 'Archive'}</span>
+                                </button>
+                            </div>
+                        )}
+
                         <span className={`text-[10px] uppercase md:normal-case tracking-tighter md:tracking-normal whitespace-nowrap ${conv.unreadCount > 0 ? 'font-black text-yellow-600 md:text-[#FEF9C3]' : 'font-black md:font-medium text-zinc-300 md:text-zinc-600'}`}>
                             {new Date(conv.lastMessage?._creationTime || conv._creationTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
