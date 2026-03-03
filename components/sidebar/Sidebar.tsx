@@ -92,12 +92,43 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                         )}
                     </span>
                     <div className="flex items-center gap-1.5 relative">
-                        {/* Status Indicators */}
-                        <div className="flex items-center gap-2 opacity-70">
-                            {isPinned && <Pin className="w-3.5 h-3.5 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
-                            {isStarred && <Star className="w-3.5 h-3.5 text-accent-star fill-current" />}
-                            {isArchived && <Archive className="w-3.5 h-3.5 text-indigo-400" />}
-                            {isBlocked && <Ban className="w-3.5 h-3.5 text-red-500" />}
+                        <div className="flex items-center gap-2">
+                            {isPinned && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
+                                    className="opacity-70 hover:opacity-100 transition-opacity"
+                                    title="Unpin"
+                                >
+                                    <Pin className="w-3.5 h-3.5 text-[#FACC15] md:text-[#FEF9C3] fill-current" />
+                                </button>
+                            )}
+                            {isStarred && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onToggleStar(); }}
+                                    className="opacity-70 hover:opacity-100 transition-opacity"
+                                    title="Unstar"
+                                >
+                                    <Star className="w-3.5 h-3.5 text-accent-star fill-current" />
+                                </button>
+                            )}
+                            {isArchived && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onToggleArchive(); }}
+                                    className="opacity-70 hover:opacity-100 transition-opacity"
+                                    title="Unarchive"
+                                >
+                                    <Archive className="w-3.5 h-3.5 text-indigo-400" />
+                                </button>
+                            )}
+                            {isBlocked && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onToggleBlock(); }}
+                                    className="opacity-70 hover:opacity-100 transition-opacity"
+                                    title="Unblock"
+                                >
+                                    <Ban className="w-3.5 h-3.5 text-red-500" />
+                                </button>
+                            )}
                         </div>
                         {/* More Button */}
                         <button
@@ -295,7 +326,7 @@ const BlockedItem = ({ user, onUnblock, onPreviewImage }: any) => (
                     e.stopPropagation();
                     onUnblock();
                 }}
-                className="px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest bg-[#FEF9C3] text-black hover:bg-[#FACC15] transition-colors"
+                className="px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest bg-[#FEF9C3] text-black hover:opacity-90 transition-colors"
             >
                 Unblock
             </button>
