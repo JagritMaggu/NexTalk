@@ -381,6 +381,12 @@ export const Sidebar = memo(function Sidebar({
                     }
                 },
             },
+            classNames: {
+                toast: "bg-[#FACC15] md:bg-[#FEF9C3] border-none shadow-2xl",
+                title: "text-black font-black",
+                description: "text-black/60 font-medium",
+                actionButton: "bg-red-500 hover:bg-red-600 text-white font-bold rounded-md border-none px-4",
+            }
         });
     };
 
@@ -440,6 +446,12 @@ export const Sidebar = memo(function Sidebar({
                     }
                 },
             },
+            classNames: {
+                toast: "bg-[#FACC15] md:bg-[#FEF9C3] border-none shadow-2xl",
+                title: "text-black font-black",
+                description: "text-black/60 font-medium",
+                actionButton: "bg-red-500 hover:bg-red-600 text-white font-bold rounded-md border-none px-4",
+            }
         });
     };
 
