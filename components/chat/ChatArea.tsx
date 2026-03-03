@@ -478,19 +478,15 @@ const ActiveChat = memo(function ActiveChat({
                     const total = pinnedMessages.length;
                     const flashAndScroll = (id: string) => {
                         const row = document.getElementById(id);
-                        const bubble = document.getElementById(`bubble-${id}`);
                         row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        if (bubble) {
-                            bubble.style.transition = 'background-color 0.15s ease, transform 0.15s ease';
-                            const originalBg = bubble.style.backgroundColor;
-                            bubble.style.backgroundColor = 'rgba(254, 249, 195, 0.9)';
-                            bubble.style.transform = 'scale(1.02)';
+                        if (row) {
+                            row.style.transition = 'background-color 0.2s ease';
+                            row.style.backgroundColor = 'rgba(254, 249, 195, 0.3)';
                             setTimeout(() => {
-                                bubble.style.transition = 'background-color 0.7s ease, transform 0.7s ease';
-                                bubble.style.backgroundColor = originalBg;
-                                bubble.style.transform = 'scale(1)';
-                                setTimeout(() => { bubble.style.cssText = ''; }, 800);
-                            }, 700);
+                                row.style.transition = 'background-color 1.2s ease';
+                                row.style.backgroundColor = 'transparent';
+                                setTimeout(() => { row.style.cssText = ''; }, 1300);
+                            }, 800);
                         }
                     };
                     return (
@@ -505,10 +501,10 @@ const ActiveChat = memo(function ActiveChat({
                                         onClick={() => {
                                             pinnedScrollRef.current?.scrollTo({ left: i * pinnedScrollRef.current.clientWidth, behavior: 'smooth' });
                                         }}
-                                        className={`w-1 md:w-1.5 rounded-full transition-all duration-300 h-3 ${i === (currentPinnedIndex % total) ? 'bg-[#FACC15] md:bg-[#FEF9C3]' : 'bg-white/10 hover:bg-white/20'}`}
+                                        className={`w-1 md:w-1.5 rounded-md transition-all duration-300 h-3 ${i === (currentPinnedIndex % total) ? 'bg-[#FACC15] md:bg-[#FEF9C3]' : 'bg-white/10 hover:bg-white/20'}`}
                                     />
                                 ))}
-                                {total > 10 && <div className="w-1 md:w-1.5 h-1.5 rounded-full bg-white/10 mx-auto" />}
+                                {total > 10 && <div className="w-1 md:w-1.5 h-1.5 rounded-md bg-white/10 mx-auto" />}
                             </div>
 
                             {/* Scrollable Content Container */}
@@ -1045,17 +1041,14 @@ const MessageItem = memo(({
                             const row = document.getElementById(id);
                             const bubble = document.getElementById(`bubble-${id}`);
                             row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            if (bubble) {
-                                bubble.style.transition = 'background-color 0.15s ease, transform 0.15s ease';
-                                const originalBg = bubble.style.backgroundColor;
-                                bubble.style.backgroundColor = 'rgba(254, 249, 195, 0.9)';
-                                bubble.style.transform = 'scale(1.02)';
+                            if (row) {
+                                row.style.transition = 'background-color 0.2s ease';
+                                row.style.backgroundColor = 'rgba(254, 249, 195, 0.3)';
                                 setTimeout(() => {
-                                    bubble.style.transition = 'background-color 0.7s ease, transform 0.7s ease';
-                                    bubble.style.backgroundColor = originalBg;
-                                    bubble.style.transform = 'scale(1)';
-                                    setTimeout(() => { bubble.style.cssText = ''; }, 800);
-                                }, 700);
+                                    row.style.transition = 'background-color 1.2s ease';
+                                    row.style.backgroundColor = 'transparent';
+                                    setTimeout(() => { row.style.cssText = ''; }, 1300);
+                                }, 800);
                             }
                         }}
                         className={`-mx-4.5 -mt-2.5 mb-2.5 bg-zinc-800 border-b border-white/5 cursor-pointer transition-all hover:opacity-90 flex items-stretch overflow-hidden rounded-t-[inherit]`}
