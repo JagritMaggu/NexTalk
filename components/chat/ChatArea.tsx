@@ -565,12 +565,15 @@ const ActiveChat = memo(function ActiveChat({
                                             onClick={() => flashAndScroll(msg._id)}
                                             className="flex-1 min-w-0 py-3 px-4 md:px-6 text-left overflow-hidden transition-colors hover:bg-white/[0.02]"
                                         >
-                                            <p className="text-sm font-semibold text-[#FACC15] md:text-[#FEF9C3] tracking-tight mb-0.5">
-                                                Pinned Message {total > 1 ? `#${i + 1}` : ''}
-                                            </p>
-                                            <p className="text-xs font-medium text-white/70 truncate">
-                                                {msg.content || (msg.fileType === 'audio' ? "Audio Clip" : msg.fileType === 'image' ? "Image" : "Shared File")}
-                                            </p>
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                    <Pin className="w-4 h-4 text-[#FACC15] md:text-[#FEF9C3] fill-current" />
+
+                                                </div>
+                                                <p className="text-sm font-medium text-white/70 truncate flex-1 leading-relaxed">
+                                                    {msg.content || (msg.fileType === 'audio' ? "Audio Clip" : msg.fileType === 'image' ? "Image" : "Shared File")}
+                                                </p>
+                                            </div>
                                         </button>
 
                                         {/* Unpin button for this specific item */}
