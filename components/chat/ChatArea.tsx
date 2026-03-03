@@ -474,16 +474,19 @@ const ActiveChat = memo(function ActiveChat({
                     const pinned = pinnedMessages[idx];
                     const total = pinnedMessages.length;
                     const flashAndScroll = (id: string) => {
-                        const el = document.getElementById(id);
-                        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        if (el) {
-                            el.style.transition = 'background-color 0.15s ease';
-                            el.style.backgroundColor = 'rgba(254, 249, 195, 0.45)';
-                            el.style.borderRadius = '20px';
+                        const row = document.getElementById(id);
+                        const bubble = document.getElementById(`bubble-${id}`);
+                        row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (bubble) {
+                            bubble.style.transition = 'background-color 0.15s ease, transform 0.15s ease';
+                            const originalBg = bubble.style.backgroundColor;
+                            bubble.style.backgroundColor = 'rgba(254, 249, 195, 0.9)';
+                            bubble.style.transform = 'scale(1.02)';
                             setTimeout(() => {
-                                el.style.transition = 'background-color 0.7s ease';
-                                el.style.backgroundColor = 'transparent';
-                                setTimeout(() => { el.style.cssText = ''; }, 800);
+                                bubble.style.transition = 'background-color 0.7s ease, transform 0.7s ease';
+                                bubble.style.backgroundColor = originalBg;
+                                bubble.style.transform = 'scale(1)';
+                                setTimeout(() => { bubble.style.cssText = ''; }, 800);
                             }, 700);
                         }
                     };
@@ -949,24 +952,30 @@ const MessageItem = memo(({
                     {msg.sender?.name}
                 </span>
             )}
-            <div className={`relative px-4.5 py-2.5 text-[14px] md:text-[15px] font-medium leading-normal ${msg.isMe
-                ? 'bg-black text-white rounded-[24px] rounded-tr-[8px]'
-                : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
-                } ${msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : ''} transition-all`}>
+            <div
+                id={`bubble-${msg._id}`}
+                className={`relative px-4.5 py-2.5 text-[14px] md:text-[15px] font-medium leading-normal ${msg.isMe
+                    ? 'bg-black text-white rounded-[24px] rounded-tr-[8px]'
+                    : 'bg-[#FEF9C3] text-[#111827] rounded-[24px] rounded-tl-[8px]'
+                    } ${msg.isDeleted ? 'italic !bg-zinc-50 !text-zinc-500 border border-zinc-100/50' : ''} transition-all`}>
 
                 {msg.parentMessage && !msg.isDeleted && (
                     <div
                         onClick={() => {
-                            const el = document.getElementById(msg.parentMessage.id);
-                            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            if (el) {
-                                el.style.transition = 'background-color 0.15s ease';
-                                el.style.backgroundColor = 'rgba(254, 249, 195, 0.45)';
-                                el.style.borderRadius = '20px';
+                            const id = msg.parentMessage.id;
+                            const row = document.getElementById(id);
+                            const bubble = document.getElementById(`bubble-${id}`);
+                            row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            if (bubble) {
+                                bubble.style.transition = 'background-color 0.15s ease, transform 0.15s ease';
+                                const originalBg = bubble.style.backgroundColor;
+                                bubble.style.backgroundColor = 'rgba(254, 249, 195, 0.9)';
+                                bubble.style.transform = 'scale(1.02)';
                                 setTimeout(() => {
-                                    el.style.transition = 'background-color 0.7s ease';
-                                    el.style.backgroundColor = 'transparent';
-                                    setTimeout(() => { el.style.cssText = ''; }, 800);
+                                    bubble.style.transition = 'background-color 0.7s ease, transform 0.7s ease';
+                                    bubble.style.backgroundColor = originalBg;
+                                    bubble.style.transform = 'scale(1)';
+                                    setTimeout(() => { bubble.style.cssText = ''; }, 800);
                                 }, 700);
                             }
                         }}
