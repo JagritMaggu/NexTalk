@@ -507,19 +507,28 @@ const ActiveChat = memo(function ActiveChat({
                                     />
                                 ))}
                             </button>
-                            {/* Content — click cycles to next */}
+                            {/* Content — click scrolls to pinned message */}
                             <button
                                 onClick={() => {
                                     flashAndScroll(pinned._id);
                                 }}
                                 className="flex-1 min-w-0 py-4 text-left overflow-hidden"
                             >
-                                <p className="text-[9px] font-black uppercase tracking-widest text-[#FEF9C3]/60 leading-none mb-1">Pinned message {total > 1 ? `${idx + 1}/${total}` : ''}</p>
                                 <p className="text-xs font-medium text-white/80 truncate">
                                     {pinned.content || (pinned.fileType === 'audio' ? "Audio Clip" : pinned.fileType === 'image' ? "Image" : "Shared File")}
                                 </p>
                             </button>
-                            <Pin className="w-3.5 h-3.5 text-[#FEF9C3]/40 fill-current flex-shrink-0 mr-4" />
+                            {/* Unpin button */}
+                            <button
+                                onClick={() => {
+                                    togglePinMessage({ messageId: pinned._id });
+                                    setCurrentPinnedIndex(0);
+                                }}
+                                className="p-2 mr-2 text-white/30 hover:text-white/70 transition-colors flex-shrink-0"
+                                title="Unpin message"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
                         </div>
                     );
                 })()}
