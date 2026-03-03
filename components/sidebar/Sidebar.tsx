@@ -25,13 +25,14 @@ import {
     Pin,
     PinOff,
     Ban,
-    ShieldAlert
+    ShieldAlert,
+    Trash2
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { toast } from "sonner";
 import CreateGroupModal from "./CreateGroupModal";
 
-const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, onToggleBlock, me }: any) => {
+const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, onToggleBlock, onDelete, me }: any) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isGroup = conv.isGroup;
     const displayName = isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
@@ -84,7 +85,11 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                 <div className="flex items-center justify-between mb-0.5">
                     <span className={`truncate text-xs md:text-sm flex items-center gap-2 ${conv.unreadCount > 0 ? 'font-black text-yellow-600 md:text-[#FEF9C3]' : 'font-bold text-black md:text-white'}`}>
                         {displayName}
-                        {isPinned && <Pin className="w-3 h-3 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
+                        <div className="flex items-center gap-1">
+                            {isPinned && <Pin className="w-3 h-3 text-[#FACC15] md:text-[#FEF9C3] fill-current" />}
+                            {isStarred && <Star className="w-3 h-3 text-accent-star fill-current" />}
+                            {isArchived && <Archive className="w-3 h-3 text-indigo-400" />}
+                        </div>
                         {isGroup && (
                             <span className="text-[8px] px-1.5 py-0.5 bg-zinc-100 md:bg-white/10 text-zinc-500 md:text-zinc-400 rounded-sm font-black uppercase tracking-tighter">
                                 {conv.participantIds?.length} members
@@ -98,7 +103,7 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                 e.stopPropagation();
                                 setIsMenuOpen(!isMenuOpen);
                             }}
-                            className={`p-1.5 rounded-full transition-all text-zinc-500 hover:text-white hover:bg-white/10 flex items-center justify-center ${isMenuOpen ? 'opacity-100 bg-white/10' : 'opacity-0 group-hover/item:opacity-100'}`}
+                            className={`p-1.5 rounded-full transition-all flex items-center justify-center ${isMenuOpen ? 'bg-zinc-200 md:bg-white/10 text-black md:text-white' : 'text-zinc-600 md:text-zinc-500 hover:bg-zinc-100 md:hover:bg-white/5 hover:text-black md:hover:text-white'}`}
                         >
                             <MoreVertical className="w-4 h-4" />
                         </button>
@@ -152,6 +157,17 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                         <span>Block</span>
                                     </button>
                                 )}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete();
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider text-red-500 hover:bg-red-500/5 flex items-center gap-2 transition-colors border-t border-white/5 mt-1"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span>Delete Chat</span>
+                                </button>
                             </div>
                         )}
 
@@ -326,6 +342,7 @@ export const Sidebar = memo(function Sidebar({
     const createOrGetConversation = useMutation(api.conversations.createOrGetConversation);
     const togglePinMutation = useMutation(api.conversations.togglePinConversation);
     const toggleBlockMutation = useMutation(api.blocks.toggleBlockUser);
+    const deleteConversationMutation = useMutation(api.conversations.deleteConversation);
 
     const blockedUserIds = useMemo(() => new Set(blockedUsers?.map((u: any) => u._id) || []), [blockedUsers]);
 
@@ -379,6 +396,21 @@ export const Sidebar = memo(function Sidebar({
             }
             return next;
         });
+    };
+
+    const handleDeleteChat = async (id: Id<"conversations">) => {
+        if (confirm("Are you sure you want to delete this chat? This will remove it for you.")) {
+            try {
+                await deleteConversationMutation({ conversationId: id });
+                if (selectedConversationId === id) {
+                    onSelectConversation(null as any);
+                }
+                toast.success("Chat deleted");
+            } catch (err) {
+                console.error("Failed to delete chat:", err);
+                toast.error("Failed to delete chat");
+            }
+        }
     };
 
     const handleUserClick = useCallback(async (userId: Id<"users">) => {
@@ -672,6 +704,7 @@ export const Sidebar = memo(function Sidebar({
                                                 const otherId = conv.participantIds.find((id: any) => id !== me?._id);
                                                 if (otherId) toggleBlock(otherId);
                                             }}
+                                            onDelete={() => handleDeleteChat(conv._id)}
                                             me={me}
                                         />
                                     ))

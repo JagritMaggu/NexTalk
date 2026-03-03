@@ -533,3 +533,59 @@ export const togglePinConversation = mutation({
         return { isPinned };
     },
 });
+
+export const deleteConversation = mutation({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Unauthorized");
+
+        const currentUser = await ctx.db
+            .query("users")
+            .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+            .unique();
+        if (!currentUser) throw new Error("User not found");
+
+        const member = await ctx.db
+            .query("conversationMembers")
+            .withIndex("by_conversationId_userId", (q) =>
+                q.eq("conversationId", conversationId).eq("userId", currentUser._id)
+            )
+            .unique();
+
+        if (!member) throw new Error("Not a member of this conversation");
+
+        // 1. Delete membership
+        await ctx.db.delete(member._id);
+
+        const conversation = await ctx.db.get(conversationId);
+        if (conversation) {
+            // 2. Remove participant from the conversation's list
+            const newParticipantIds = conversation.participantIds.filter(id => id !== currentUser._id);
+
+            if (newParticipantIds.length === 0) {
+                // 3. If no participants left, fully clear conversation and related data
+                await ctx.db.delete(conversationId);
+
+                // Delete messages
+                const messages = await ctx.db
+                    .query("messages")
+                    .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
+                    .collect();
+
+                for (const msg of messages) {
+                    await ctx.db.delete(msg._id);
+                    // Delete reactions
+                    const reactions = await ctx.db
+                        .query("reactions")
+                        .withIndex("by_messageId", (q) => q.eq("messageId", msg._id))
+                        .collect();
+                    for (const r of reactions) await ctx.db.delete(r._id);
+                }
+            } else {
+                // Just patch the participant list
+                await ctx.db.patch(conversationId, { participantIds: newParticipantIds });
+            }
+        }
+    },
+});
