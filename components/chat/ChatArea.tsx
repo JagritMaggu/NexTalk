@@ -61,6 +61,7 @@ const ActiveChat = memo(function ActiveChat({
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
     const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
+    const pinnedScrollRef = useRef<HTMLDivElement>(null);
     const isFirstLoad = useRef(true);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
@@ -493,50 +494,65 @@ const ActiveChat = memo(function ActiveChat({
                     return (
                         <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-stretch animate-in fade-in slide-in-from-top-2 duration-300 min-h-[72px]">
                             {/* Progress indicator / Index Button */}
-                            <button
-                                onClick={() => {
-                                    const nextIdx = (idx + 1) % total;
-                                    setCurrentPinnedIndex(nextIdx);
-                                    flashAndScroll(pinnedMessages[nextIdx]._id);
-                                }}
-                                className="flex flex-col gap-[3px] justify-center px-4 self-stretch hover:bg-white/5 transition-colors flex-shrink-0 border-r border-white/5"
-                                title={`${idx + 1} of ${total} pinned`}
+                            <div
+                                className="flex flex-col gap-[3px] justify-center px-4 self-stretch border-r border-white/5 flex-shrink-0"
                             >
                                 {Array.from({ length: total }).map((_, i) => (
-                                    <div
+                                    <button
                                         key={i}
-                                        className={`w-1 rounded-full transition-all duration-300 ${i === idx ? 'bg-[#FEF9C3] flex-1' : 'bg-white/20'}`}
+                                        onClick={() => {
+                                            pinnedScrollRef.current?.scrollTo({ left: i * pinnedScrollRef.current.clientWidth, behavior: 'smooth' });
+                                        }}
+                                        className={`w-1 rounded-full transition-all duration-300 ${i === idx ? 'bg-[#FEF9C3] flex-1' : 'bg-white/10 hover:bg-white/20'}`}
                                         style={{ height: i === idx ? '16px' : '4px' }}
                                     />
                                 ))}
-                            </button>
-                            {/* Content — scrollable area would be overkill for 1 line, let's keep the cycling clean but taller */}
-                            <button
-                                onClick={() => {
-                                    flashAndScroll(pinned._id);
+                            </div>
+
+                            {/* Scrollable Content Container */}
+                            <div
+                                ref={pinnedScrollRef}
+                                onScroll={(e) => {
+                                    const scrollLeft = e.currentTarget.scrollLeft;
+                                    const width = e.currentTarget.clientWidth;
+                                    const newIdx = Math.round(scrollLeft / width);
+                                    if (newIdx !== idx) setCurrentPinnedIndex(newIdx);
                                 }}
-                                className="flex-1 min-w-0 py-5 px-4 text-left overflow-hidden group/content"
+                                className="flex-1 flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
                             >
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Pin className="w-3 h-3 text-[#FEF9C3]/60 fill-current" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#FEF9C3]/40">Pinned</span>
-                                </div>
-                                <p className="text-sm font-medium text-white/90 truncate">
-                                    {pinned.content || (pinned.fileType === 'audio' ? "Audio Clip" : pinned.fileType === 'image' ? "Image" : "Shared File")}
-                                </p>
-                            </button>
-                            {/* Unpin button */}
-                            <div className="flex items-center px-2">
-                                <button
-                                    onClick={() => {
-                                        togglePinMessage({ messageId: pinned._id });
-                                        setCurrentPinnedIndex(0);
-                                    }}
-                                    className="p-3 text-white/60 hover:text-white hover:bg-white/5 rounded-full transition-all flex-shrink-0"
-                                    title="Unpin message"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+                                {pinnedMessages.map((msg: any, i: number) => (
+                                    <div
+                                        key={msg._id}
+                                        className="flex-shrink-0 w-full snap-center flex items-center"
+                                    >
+                                        <button
+                                            onClick={() => flashAndScroll(msg._id)}
+                                            className="flex-1 min-w-0 py-5 px-4 text-left overflow-hidden"
+                                        >
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Pin className="w-3 h-3 text-[#FEF9C3]/60 fill-current" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-[#FEF9C3]/30">Pinned {i + 1}/{total}</span>
+                                            </div>
+                                            <p className="text-sm font-medium text-white/90 truncate">
+                                                {msg.content || (msg.fileType === 'audio' ? "Audio Clip" : msg.fileType === 'image' ? "Image" : "Shared File")}
+                                            </p>
+                                        </button>
+
+                                        {/* Unpin button for this specific item */}
+                                        <div className="flex items-center px-2">
+                                            <button
+                                                onClick={() => {
+                                                    togglePinMessage({ messageId: msg._id });
+                                                    if (i === total - 1 && i > 0) setCurrentPinnedIndex(i - 1);
+                                                }}
+                                                className="p-3 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all flex-shrink-0"
+                                                title="Unpin message"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     );
