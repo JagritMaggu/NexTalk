@@ -31,6 +31,30 @@ export const sendMessage = mutation({
             throw new Error("This group no longer exists");
         }
 
+        // Feature: Blocking - Prevent messaging in blocked DMs
+        if (!conversation.isGroup) {
+            const otherUserId = conversation.participantIds.find(id => id !== currentUser._id);
+            if (otherUserId) {
+                // Check if I blocked them
+                const iBlockedThem = await ctx.db
+                    .query("blocks")
+                    .withIndex("by_blockerId_blockedId", (q) =>
+                        q.eq("blockerId", currentUser._id).eq("blockedId", otherUserId)
+                    )
+                    .unique();
+                if (iBlockedThem) throw new Error("You have blocked this contact. Unblock to send messages.");
+
+                // Check if they blocked me
+                const theyBlockedMe = await ctx.db
+                    .query("blocks")
+                    .withIndex("by_blockerId_blockedId", (q) =>
+                        q.eq("blockerId", otherUserId).eq("blockedId", currentUser._id)
+                    )
+                    .unique();
+                if (theyBlockedMe) throw new Error("This contact has blocked you.");
+            }
+        }
+
         // Insert the message
         const messageId = await ctx.db.insert("messages", {
             conversationId,

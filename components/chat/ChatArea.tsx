@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote, Mic, StopCircle, Square, Pin } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote, Mic, StopCircle, Square, Pin, ShieldAlert } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -88,6 +88,8 @@ const ActiveChat = memo(function ActiveChat({
     const setTyping = useMutation(api.typing.setTyping);
     const clearTyping = useMutation(api.typing.clearTyping);
     const editMessage = useMutation(api.messages.editMessage);
+    const blockStatus = useQuery(api.blocks.getBlockStatusByConversationId, { conversationId });
+    const toggleBlockMutation = useMutation(api.blocks.toggleBlockUser);
 
     const isGroup = conversation?.isGroup;
     const displayName = isGroup ? conversation.groupName : (conversation?.otherParticipants?.[0] as any)?.name;
@@ -685,6 +687,25 @@ const ActiveChat = memo(function ActiveChat({
                     {conversation?.isDeleted ? (
                         <div className="flex items-center justify-center h-12 bg-zinc-50 rounded-full border border-zinc-100">
                             <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">This group no longer exists</p>
+                        </div>
+                    ) : (blockStatus?.blockedByMe || blockStatus?.blockedByThem) && !isGroup ? (
+                        <div className="flex flex-col items-center justify-center py-6 px-6 bg-zinc-900/40 backdrop-blur-md rounded-[32px] border border-white/5 animate-in fade-in slide-in-from-bottom-2 shadow-2xl">
+                            <ShieldAlert className="w-8 h-8 text-red-500 mb-3 opacity-80" />
+                            <p className="text-sm font-black text-white/90 tracking-tight text-center">
+                                {blockStatus.blockedByMe ? (
+                                    <>You have blocked this contact<br /><span className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 block">You can't send or receive messages</span></>
+                                ) : (
+                                    <>This contact has blocked you<br /><span className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 block">Message sending is disabled</span></>
+                                )}
+                            </p>
+                            {blockStatus.blockedByMe && blockStatus.otherUserId && (
+                                <button
+                                    onClick={() => toggleBlockMutation({ userId: blockStatus.otherUserId as any })}
+                                    className="mt-4 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-lg shadow-red-500/20"
+                                >
+                                    Unblock
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div className="relative">

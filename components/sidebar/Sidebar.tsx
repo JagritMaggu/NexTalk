@@ -23,12 +23,15 @@ import {
     Check,
     CheckCheck,
     Pin,
-    PinOff
+    PinOff,
+    Ban,
+    ShieldAlert
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
+import { toast } from "sonner";
 import CreateGroupModal from "./CreateGroupModal";
 
-const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, me }: any) => {
+const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleStar, isStarred, onToggleArchive, isArchived, onTogglePin, isPinned, onToggleBlock, me }: any) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isGroup = conv.isGroup;
     const displayName = isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
@@ -136,6 +139,19 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                     <Archive className="w-3.5 h-3.5" />
                                     <span>{isArchived ? 'Unarchive' : 'Archive'}</span>
                                 </button>
+                                {!isGroup && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onToggleBlock();
+                                            setIsMenuOpen(false);
+                                        }}
+                                        className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider text-red-500 hover:bg-red-500/5 flex items-center gap-2 transition-colors border-t border-white/5 mt-1"
+                                    >
+                                        <Ban className="w-3.5 h-3.5" />
+                                        <span>Block</span>
+                                    </button>
+                                )}
                             </div>
                         )}
 
@@ -235,6 +251,38 @@ const PeopleSkeleton = () => (
     </div>
 );
 
+const BlockedItem = ({ user, onUnblock, onPreviewImage }: any) => (
+    <div className="flex items-center justify-between gap-3 w-full p-3.5 hover:bg-zinc-50 md:hover:bg-white/[0.02] rounded-3xl md:rounded-none transition-all group">
+        <div className="flex items-center gap-3">
+            <div
+                onClick={() => user.image && onPreviewImage(user.image)}
+                className={`w-10 h-10 md:w-11 md:h-11 rounded-full overflow-hidden shadow-sm border border-zinc-100 md:border-white/10 ${user.image ? 'cursor-pointer' : ''}`}
+            >
+                {user.image ? (
+                    <img src={user.image} className="w-full h-full object-cover" alt="" />
+                ) : (
+                    <div className="w-full h-full bg-red-500/10 flex items-center justify-center text-red-500 font-bold">
+                        <span className="text-xs">{user.name?.charAt(0) || "U"}</span>
+                    </div>
+                )}
+            </div>
+            <div className="text-left">
+                <p className="font-bold text-black md:text-white text-xs md:text-sm">{user.name}</p>
+                <p className="text-[8px] font-black uppercase tracking-widest text-red-500/60">Blocked</p>
+            </div>
+        </div>
+        <button
+            onClick={(e) => {
+                e.stopPropagation();
+                onUnblock();
+            }}
+            className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-white hover:bg-white/10 transition-all border border-zinc-200 md:border-white/10"
+        >
+            Unblock
+        </button>
+    </div>
+);
+
 interface SidebarProps {
     selectedConversationId: Id<"conversations"> | null;
     onSelectConversation: (id: Id<"conversations">) => void;
@@ -269,13 +317,31 @@ export const Sidebar = memo(function Sidebar({
         return new Set();
     });
 
-    const [viewMode, setViewMode] = useState<"all" | "favorites" | "archived">("all");
+    const [viewMode, setViewMode] = useState<"all" | "favorites" | "archived" | "blocked">("all");
 
     const conversations = useQuery(api.conversations.getMyConversations);
     const allUsers = useQuery(api.users.getAllUsers);
+    const blockedUsers = useQuery(api.blocks.getBlockedUsers);
     const me = useQuery(api.users.getMe);
     const createOrGetConversation = useMutation(api.conversations.createOrGetConversation);
     const togglePinMutation = useMutation(api.conversations.togglePinConversation);
+    const toggleBlockMutation = useMutation(api.blocks.toggleBlockUser);
+
+    const blockedUserIds = useMemo(() => new Set(blockedUsers?.map((u: any) => u._id) || []), [blockedUsers]);
+
+    const toggleBlock = async (userId: Id<"users">) => {
+        try {
+            const result = await toggleBlockMutation({ userId });
+            if (result?.blocked) {
+                toast.success("User blocked");
+            } else {
+                toast.success("User unblocked");
+            }
+        } catch (err) {
+            console.error("Failed to block user:", err);
+            toast.error("Failed to update block status");
+        }
+    };
 
     const togglePin = async (id: Id<"conversations">) => {
         try {
@@ -338,8 +404,15 @@ export const Sidebar = memo(function Sidebar({
         } else if (viewMode === "archived") {
             valid = valid.filter(c => archivedIds.has(c._id));
         } else {
-            // "All" view hides archived by default
+            // "All" view hides archived and blocked by default
             valid = valid.filter(c => !archivedIds.has(c._id));
+            if (viewMode === "all" && blockedUserIds.size > 0) {
+                valid = valid.filter(c => {
+                    if (c.isGroup) return true;
+                    const otherId = c.participantIds.find((id: any) => id !== me?._id);
+                    return !blockedUserIds.has(otherId);
+                });
+            }
         }
 
         // Time Range Filter
@@ -534,6 +607,13 @@ export const Sidebar = memo(function Sidebar({
                             >
                                 <Archive className="w-4 h-4" />
                             </button>
+                            <button
+                                onClick={() => { setActiveTab("chats"); setViewMode("blocked"); }}
+                                className={`p-1.5 rounded transition-all ${activeTab === 'chats' && viewMode === 'blocked' ? 'bg-transparent text-red-500' : 'text-zinc-400 hover:text-red-500'}`}
+                                title="Blocked"
+                            >
+                                <Ban className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
 
@@ -553,30 +633,54 @@ export const Sidebar = memo(function Sidebar({
                 <div className="flex-1 overflow-y-auto px-2.5 md:px-2.5 no-scrollbar pb-32">
                     {activeTab === 'chats' ? (
                         <div className="flex flex-col gap-0 md:gap-1 mt-4 md:mt-0">
-                            {conversations === undefined ? (
-                                Array(5).fill(0).map((_, i) => <ConversationSkeleton key={i} />)
-                            ) : filteredConversations.length > 0 ? (
-                                filteredConversations.map((conv: any) => (
-                                    <ConversationItem
-                                        key={conv._id}
-                                        conv={conv}
-                                        isSelected={selectedConversationId === conv._id}
-                                        onClick={() => onSelectConversation(conv._id)}
-                                        onPreviewImage={setPreviewImage}
-                                        onToggleStar={() => toggleStar(conv._id)}
-                                        isStarred={starredIds.has(conv._id)}
-                                        onToggleArchive={() => toggleArchive(conv._id)}
-                                        isArchived={archivedIds.has(conv._id)}
-                                        onTogglePin={() => togglePin(conv._id)}
-                                        isPinned={conv.isPinned}
-                                        me={me}
-                                    />
-                                ))
+                            {viewMode === 'blocked' ? (
+                                blockedUsers === undefined ? (
+                                    Array(3).fill(0).map((_, i) => <PeopleSkeleton key={i} />)
+                                ) : blockedUsers.length > 0 ? (
+                                    blockedUsers.map((user: any) => (
+                                        <BlockedItem
+                                            key={user._id}
+                                            user={user}
+                                            onUnblock={() => toggleBlock(user._id)}
+                                            onPreviewImage={setPreviewImage}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
+                                        <Ban className="w-12 h-12 mb-4 opacity-10" />
+                                        <p className="text-sm font-bold tracking-tight">No blocked users</p>
+                                    </div>
+                                )
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
-                                    <MessageCircle className="w-12 h-12 mb-4 opacity-10" />
-                                    <p className="text-sm font-bold tracking-tight">No conversations found</p>
-                                </div>
+                                conversations === undefined ? (
+                                    Array(5).fill(0).map((_, i) => <ConversationSkeleton key={i} />)
+                                ) : filteredConversations.length > 0 ? (
+                                    filteredConversations.map((conv: any) => (
+                                        <ConversationItem
+                                            key={conv._id}
+                                            conv={conv}
+                                            isSelected={selectedConversationId === conv._id}
+                                            onClick={() => onSelectConversation(conv._id)}
+                                            onPreviewImage={setPreviewImage}
+                                            onToggleStar={() => toggleStar(conv._id)}
+                                            isStarred={starredIds.has(conv._id)}
+                                            onToggleArchive={() => toggleArchive(conv._id)}
+                                            isArchived={archivedIds.has(conv._id)}
+                                            onTogglePin={() => togglePin(conv._id)}
+                                            isPinned={conv.isPinned}
+                                            onToggleBlock={() => {
+                                                const otherId = conv.participantIds.find((id: any) => id !== me?._id);
+                                                if (otherId) toggleBlock(otherId);
+                                            }}
+                                            me={me}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
+                                        <MessageCircle className="w-12 h-12 mb-4 opacity-10" />
+                                        <p className="text-sm font-bold tracking-tight">No conversations found</p>
+                                    </div>
+                                )
                             )}
                         </div>
                     ) : (

@@ -80,4 +80,14 @@ export default defineSchema({
         .index("by_conversationId", ["conversationId"])
         .index("by_userId", ["userId"])
         .index("by_conversationId_userId", ["conversationId", "userId"]),
+
+    // ─── Blocks ─────────────────────────────────────────────────────────────
+    // Tracks blocked users (Feature: Blocking)
+    blocks: defineTable({
+        blockerId: v.id("users"), // the user who is doing the blocking
+        blockedId: v.id("users"), // the user who is being blocked
+    })
+        .index("by_blockerId", ["blockerId"])
+        .index("by_blockedId", ["blockedId"])
+        .index("by_blockerId_blockedId", ["blockerId", "blockedId"]),
 });
