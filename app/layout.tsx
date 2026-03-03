@@ -7,7 +7,6 @@ import "./globals.css";
 import { ConvexClientProvider } from "./providers/ConvexClientProvider";
 import { dark } from "@clerk/themes";
 import { Toaster } from "sonner";
-import ConsoleFilter from "@/components/ConsoleFilter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,10 +67,26 @@ export default function RootLayout({
       }}
     >
       <html lang="en" className="dark">
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  const originalWarn = console.warn;
+                  console.warn = function(...args) {
+                    if (args[0] && typeof args[0] === 'string' && args[0].includes('Clerk: Clerk has been loaded with development keys')) {
+                      return;
+                    }
+                    originalWarn.apply(console, args);
+                  };
+                })();
+              `,
+            }}
+          />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-zinc-50`}
         >
-          <ConsoleFilter />
           <ConvexClientProvider>
             <main className="h-screen w-full overflow-hidden">{children}</main>
             <Toaster position="top-center" richColors expand={false} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote, Mic, StopCircle, Square, Pin, ShieldAlert } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, MessageCircle, MoreVertical, Paperclip, Phone, Search, Send, Smile, User, Users, Video, ImageIcon, Trash2, Heart, ThumbsUp, Laugh, Frown, MoreHorizontal, Download, FileText, ArrowDown, X, Music, LayoutGrid, Check, CheckCheck, Edit2, CornerUpLeft, Quote, Mic, StopCircle, Square, Pin, ShieldAlert } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -494,31 +494,32 @@ const ActiveChat = memo(function ActiveChat({
                         }
                     };
                     return (
-                        <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-stretch animate-in fade-in slide-in-from-top-2 duration-300 h-[60px]">
+                        <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-stretch animate-in fade-in slide-in-from-top-2 duration-300 h-[60px] group/pinned">
                             {/* Progress indicator / Index Button */}
                             <div
-                                className="flex flex-col gap-[3px] justify-center px-4 self-stretch border-r border-white/5 flex-shrink-0"
+                                className="flex flex-col gap-[3px] justify-center px-4 md:px-5 self-stretch border-r border-white/5 flex-shrink-0 bg-white/[0.02]"
                             >
-                                {Array.from({ length: total }).map((_, i) => (
+                                {Array.from({ length: Math.min(total, 10) }).map((_, i) => (
                                     <button
                                         key={i}
                                         onClick={() => {
                                             pinnedScrollRef.current?.scrollTo({ left: i * pinnedScrollRef.current.clientWidth, behavior: 'smooth' });
                                         }}
-                                        className={`w-1 rounded-full ${i === idx ? 'bg-[#FEF9C3]' : 'bg-white/10 hover:bg-white/20'}`}
-                                        style={{ height: i === idx ? '12px' : '4px' }}
+                                        className={`w-1 md:w-1.5 rounded-full transition-all duration-300 h-3 ${i === (currentPinnedIndex % total) ? 'bg-[#FACC15] md:bg-[#FEF9C3]' : 'bg-white/10 hover:bg-white/20'}`}
                                     />
                                 ))}
+                                {total > 10 && <div className="w-1 md:w-1.5 h-1.5 rounded-full bg-white/10 mx-auto" />}
                             </div>
 
                             {/* Scrollable Content Container */}
                             <div
                                 ref={pinnedScrollRef}
-                                onScroll={(e) => {
+                                onScroll={(e: any) => {
                                     const scrollLeft = e.currentTarget.scrollLeft;
                                     const width = e.currentTarget.clientWidth;
+                                    if (width === 0) return;
                                     const newIdx = Math.round(scrollLeft / width);
-                                    if (newIdx !== idx) setCurrentPinnedIndex(newIdx);
+                                    if (newIdx !== currentPinnedIndex) setCurrentPinnedIndex(newIdx);
                                 }}
                                 onMouseDown={(e) => {
                                     const el = pinnedScrollRef.current;
@@ -562,21 +563,24 @@ const ActiveChat = memo(function ActiveChat({
                                     >
                                         <button
                                             onClick={() => flashAndScroll(msg._id)}
-                                            className="flex-1 min-w-0 py-3 px-4 text-left overflow-hidden"
+                                            className="flex-1 min-w-0 py-3 px-4 md:px-6 text-left overflow-hidden transition-colors hover:bg-white/[0.02]"
                                         >
-                                            <p className="text-sm font-medium text-white/90 truncate">
+                                            <p className="text-sm font-semibold text-[#FACC15] md:text-[#FEF9C3] tracking-tight mb-0.5">
+                                                Pinned Message {total > 1 ? `#${i + 1}` : ''}
+                                            </p>
+                                            <p className="text-xs font-medium text-white/70 truncate">
                                                 {msg.content || (msg.fileType === 'audio' ? "Audio Clip" : msg.fileType === 'image' ? "Image" : "Shared File")}
                                             </p>
                                         </button>
 
                                         {/* Unpin button for this specific item */}
-                                        <div className="flex items-center px-1">
+                                        <div className="flex items-center px-1 border-l border-white/5">
                                             <button
                                                 onClick={() => {
                                                     togglePinMessage({ messageId: msg._id });
                                                     if (i === total - 1 && i > 0) setCurrentPinnedIndex(i - 1);
                                                 }}
-                                                className="p-2 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all flex-shrink-0"
+                                                className="p-2 text-white/40 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all flex-shrink-0"
                                                 title="Unpin"
                                             >
                                                 <X className="w-4 h-4" />
