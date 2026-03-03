@@ -338,7 +338,7 @@ interface SidebarProps {
     selectedConversationId: Id<"conversations"> | null;
     onSelectConversation: (id: Id<"conversations">) => void;
 }
-
+// sidebar props
 export const Sidebar = memo(function Sidebar({
     selectedConversationId,
     onSelectConversation,
