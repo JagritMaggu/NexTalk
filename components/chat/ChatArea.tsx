@@ -60,6 +60,7 @@ const ActiveChat = memo(function ActiveChat({
     const [replyingTo, setReplyingTo] = useState<any | null>(null);
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
+    const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
     const isFirstLoad = useRef(true);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
@@ -468,35 +469,60 @@ const ActiveChat = memo(function ActiveChat({
 
             <div className="flex-1 bg-white rounded-t-[40px] md:rounded-none flex flex-col overflow-hidden">
                 {/* Pinned Messages Bar - stays sticky above scroll */}
-                {pinnedMessages && pinnedMessages.length > 0 && (
-                    <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 px-5 py-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <Pin className="w-4 h-4 text-[#FEF9C3] fill-current flex-shrink-0" />
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                            <p className="text-xs font-medium text-white/70 truncate">
-                                {pinnedMessages[0].content || (pinnedMessages[0].fileType === 'audio' ? "Audio Clip" : pinnedMessages[0].fileType === 'image' ? "Image" : "Shared File")}
-                            </p>
+                {pinnedMessages && pinnedMessages.length > 0 && (() => {
+                    const idx = currentPinnedIndex % pinnedMessages.length;
+                    const pinned = pinnedMessages[idx];
+                    const total = pinnedMessages.length;
+                    const flashAndScroll = (id: string) => {
+                        const el = document.getElementById(id);
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (el) {
+                            el.style.transition = 'background-color 0.15s ease';
+                            el.style.backgroundColor = 'rgba(254, 249, 195, 0.45)';
+                            el.style.borderRadius = '20px';
+                            setTimeout(() => {
+                                el.style.transition = 'background-color 0.7s ease';
+                                el.style.backgroundColor = 'transparent';
+                                setTimeout(() => { el.style.cssText = ''; }, 800);
+                            }, 700);
+                        }
+                    };
+                    return (
+                        <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-center animate-in fade-in slide-in-from-top-2 duration-300">
+                            {/* Progress indicator */}
+                            <button
+                                onClick={() => {
+                                    const nextIdx = (idx + 1) % total;
+                                    setCurrentPinnedIndex(nextIdx);
+                                    flashAndScroll(pinnedMessages[nextIdx]._id);
+                                }}
+                                className="flex flex-col gap-[3px] justify-center px-3 py-4 self-stretch hover:bg-white/5 transition-colors flex-shrink-0"
+                                title={`${idx + 1} of ${total} pinned`}
+                            >
+                                {Array.from({ length: total }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className={`w-1 rounded-full transition-all duration-300 ${i === idx ? 'bg-[#FEF9C3] flex-1' : 'bg-white/20'}`}
+                                        style={{ height: i === idx ? '14px' : '4px' }}
+                                    />
+                                ))}
+                            </button>
+                            {/* Content — click cycles to next */}
+                            <button
+                                onClick={() => {
+                                    flashAndScroll(pinned._id);
+                                }}
+                                className="flex-1 min-w-0 py-4 text-left overflow-hidden"
+                            >
+                                <p className="text-[9px] font-black uppercase tracking-widest text-[#FEF9C3]/60 leading-none mb-1">Pinned message {total > 1 ? `${idx + 1}/${total}` : ''}</p>
+                                <p className="text-xs font-medium text-white/80 truncate">
+                                    {pinned.content || (pinned.fileType === 'audio' ? "Audio Clip" : pinned.fileType === 'image' ? "Image" : "Shared File")}
+                                </p>
+                            </button>
+                            <Pin className="w-3.5 h-3.5 text-[#FEF9C3]/40 fill-current flex-shrink-0 mr-4" />
                         </div>
-                        <button
-                            onClick={() => {
-                                const el = document.getElementById(pinnedMessages[0]._id);
-                                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                if (el) {
-                                    el.style.transition = 'background-color 0.15s ease';
-                                    el.style.backgroundColor = 'rgba(254, 249, 195, 0.45)';
-                                    el.style.borderRadius = '20px';
-                                    setTimeout(() => {
-                                        el.style.transition = 'background-color 0.7s ease';
-                                        el.style.backgroundColor = 'transparent';
-                                        setTimeout(() => { el.style.cssText = ''; }, 800);
-                                    }, 700);
-                                }
-                            }}
-                            className="text-[9px] font-black text-[#FEF9C3] uppercase tracking-widest hover:text-yellow-300 transition-colors flex-shrink-0"
-                        >
-                            View
-                        </button>
-                    </div>
-                )}
+                    );
+                })()}
                 {/* ─── MESSAGES ─── */}
                 <div
                     ref={scrollContainerRef}
