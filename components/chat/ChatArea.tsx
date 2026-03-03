@@ -505,8 +505,8 @@ const ActiveChat = memo(function ActiveChat({
                                         onClick={() => {
                                             pinnedScrollRef.current?.scrollTo({ left: i * pinnedScrollRef.current.clientWidth, behavior: 'smooth' });
                                         }}
-                                        className={`w-1 rounded-full transition-all duration-300 ${i === idx ? 'bg-[#FEF9C3] flex-1 max-h-[16px]' : 'bg-white/10 hover:bg-white/20'}`}
-                                        style={{ height: i === idx ? '100%' : '4px' }}
+                                        className={`w-1 rounded-full ${i === idx ? 'bg-[#FEF9C3]' : 'bg-white/10 hover:bg-white/20'}`}
+                                        style={{ height: i === idx ? '12px' : '4px' }}
                                     />
                                 ))}
                             </div>
@@ -520,7 +520,40 @@ const ActiveChat = memo(function ActiveChat({
                                     const newIdx = Math.round(scrollLeft / width);
                                     if (newIdx !== idx) setCurrentPinnedIndex(newIdx);
                                 }}
-                                className="flex-1 flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
+                                onMouseDown={(e) => {
+                                    const el = pinnedScrollRef.current;
+                                    if (!el) return;
+                                    el.classList.add('grabbing');
+                                    el.style.cursor = 'grabbing';
+                                    el.dataset.isDragging = 'true';
+                                    el.dataset.startX = (e.pageX - el.offsetLeft).toString();
+                                    el.dataset.scrollLeft = el.scrollLeft.toString();
+                                }}
+                                onMouseLeave={(e) => {
+                                    const el = pinnedScrollRef.current;
+                                    if (!el) return;
+                                    el.classList.remove('grabbing');
+                                    el.style.cursor = 'grab';
+                                    el.dataset.isDragging = 'false';
+                                }}
+                                onMouseUp={(e) => {
+                                    const el = pinnedScrollRef.current;
+                                    if (!el) return;
+                                    el.classList.remove('grabbing');
+                                    el.style.cursor = 'grab';
+                                    el.dataset.isDragging = 'false';
+                                }}
+                                onMouseMove={(e) => {
+                                    const el = pinnedScrollRef.current;
+                                    if (!el || el.dataset.isDragging !== 'true') return;
+                                    e.preventDefault();
+                                    const x = e.pageX - el.offsetLeft;
+                                    const startX = parseInt(el.dataset.startX || '0');
+                                    const sLeft = parseInt(el.dataset.scrollLeft || '0');
+                                    const walk = (x - startX) * 1.5;
+                                    el.scrollLeft = sLeft - walk;
+                                }}
+                                className="flex-1 flex overflow-x-auto snap-x snap-mandatory no-scrollbar cursor-grab"
                             >
                                 {pinnedMessages.map((msg: any, i: number) => (
                                     <div
