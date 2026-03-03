@@ -524,7 +524,7 @@ const ActiveChat = memo(function ActiveChat({
                                     togglePinMessage({ messageId: pinned._id });
                                     setCurrentPinnedIndex(0);
                                 }}
-                                className="p-2 mr-2 text-white/30 hover:text-white/70 transition-colors flex-shrink-0"
+                                className="p-2 mr-2 text-white/60 hover:text-white transition-colors flex-shrink-0"
                                 title="Unpin message"
                             >
                                 <X className="w-3.5 h-3.5" />
