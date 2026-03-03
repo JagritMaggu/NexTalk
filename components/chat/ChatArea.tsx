@@ -494,7 +494,7 @@ const ActiveChat = memo(function ActiveChat({
                         }
                     };
                     return (
-                        <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-stretch animate-in fade-in slide-in-from-top-2 duration-300 min-h-[72px]">
+                        <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-stretch animate-in fade-in slide-in-from-top-2 duration-300 h-[60px]">
                             {/* Progress indicator / Index Button */}
                             <div
                                 className="flex flex-col gap-[3px] justify-center px-4 self-stretch border-r border-white/5 flex-shrink-0"
@@ -505,8 +505,8 @@ const ActiveChat = memo(function ActiveChat({
                                         onClick={() => {
                                             pinnedScrollRef.current?.scrollTo({ left: i * pinnedScrollRef.current.clientWidth, behavior: 'smooth' });
                                         }}
-                                        className={`w-1 rounded-full transition-all duration-300 ${i === idx ? 'bg-[#FEF9C3] flex-1' : 'bg-white/10 hover:bg-white/20'}`}
-                                        style={{ height: i === idx ? '16px' : '4px' }}
+                                        className={`w-1 rounded-full transition-all duration-300 ${i === idx ? 'bg-[#FEF9C3] flex-1 max-h-[16px]' : 'bg-white/10 hover:bg-white/20'}`}
+                                        style={{ height: i === idx ? '100%' : '4px' }}
                                     />
                                 ))}
                             </div>
@@ -529,26 +529,22 @@ const ActiveChat = memo(function ActiveChat({
                                     >
                                         <button
                                             onClick={() => flashAndScroll(msg._id)}
-                                            className="flex-1 min-w-0 py-5 px-4 text-left overflow-hidden"
+                                            className="flex-1 min-w-0 py-3 px-4 text-left overflow-hidden"
                                         >
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Pin className="w-3 h-3 text-[#FEF9C3]/60 fill-current" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-[#FEF9C3]/30">Pinned {i + 1}/{total}</span>
-                                            </div>
                                             <p className="text-sm font-medium text-white/90 truncate">
                                                 {msg.content || (msg.fileType === 'audio' ? "Audio Clip" : msg.fileType === 'image' ? "Image" : "Shared File")}
                                             </p>
                                         </button>
 
                                         {/* Unpin button for this specific item */}
-                                        <div className="flex items-center px-2">
+                                        <div className="flex items-center px-1">
                                             <button
                                                 onClick={() => {
                                                     togglePinMessage({ messageId: msg._id });
                                                     if (i === total - 1 && i > 0) setCurrentPinnedIndex(i - 1);
                                                 }}
-                                                className="p-3 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all flex-shrink-0"
-                                                title="Unpin message"
+                                                className="p-2 text-white/40 hover:text-white hover:bg-white/5 rounded-full transition-all flex-shrink-0"
+                                                title="Unpin"
                                             >
                                                 <X className="w-4 h-4" />
                                             </button>
