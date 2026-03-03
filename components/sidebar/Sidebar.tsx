@@ -153,10 +153,10 @@ const ConversationItem = ({ conv, onClick, isSelected, onPreviewImage, onToggleS
                                             onToggleBlock();
                                             setIsMenuOpen(false);
                                         }}
-                                        className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider text-red-500 hover:bg-red-500/5 flex items-center gap-2 transition-colors border-t border-white/5 mt-1"
+                                        className={`w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition-colors border-t border-white/5 mt-1 ${isBlocked ? 'text-zinc-500 md:text-zinc-400 hover:bg-zinc-50 md:hover:bg-white/5' : 'text-red-500 hover:bg-red-500/5'}`}
                                     >
                                         <Ban className="w-3.5 h-3.5" />
-                                        <span>Block</span>
+                                        <span>{isBlocked ? 'Unblock' : 'Block'}</span>
                                     </button>
                                 )}
                                 <button
@@ -350,18 +350,38 @@ export const Sidebar = memo(function Sidebar({
 
     const blockedUserIds = useMemo(() => new Set(blockedUsers?.map((u: any) => u._id) || []), [blockedUsers]);
 
-    const toggleBlock = async (userId: Id<"users">) => {
-        try {
-            const result = await toggleBlockMutation({ userId });
-            if (result?.blocked) {
-                toast.success("User blocked");
-            } else {
-                toast.success("User unblocked");
+    const toggleBlock = async (userId: Id<"users">, name: string) => {
+        const isCurrentlyBlocked = blockedUserIds.has(userId);
+
+        if (isCurrentlyBlocked) {
+            // Directly unblock without confirmation
+            try {
+                await toggleBlockMutation({ userId });
+                toast.success(`${name} unblocked`);
+            } catch (err) {
+                toast.error("Failed to unblock user");
             }
-        } catch (err) {
-            console.error("Failed to block user:", err);
-            toast.error("Failed to update block status");
+            return;
         }
+
+        // Blocking requires confirmation
+        toast(`Block ${name}?`, {
+            description: "This will prevent them from messaging you.",
+            action: {
+                label: "Block",
+                onClick: async () => {
+                    try {
+                        const result = await toggleBlockMutation({ userId });
+                        if (result?.blocked) {
+                            toast.success(`${name} blocked`);
+                        }
+                    } catch (err) {
+                        console.error("Failed to block user:", err);
+                        toast.error("Failed to block user");
+                    }
+                },
+            },
+        });
     };
 
     const togglePin = async (id: Id<"conversations">) => {
@@ -402,19 +422,25 @@ export const Sidebar = memo(function Sidebar({
         });
     };
 
-    const handleDeleteChat = async (id: Id<"conversations">) => {
-        if (confirm("Are you sure you want to delete this chat? This will remove it for you.")) {
-            try {
-                await deleteConversationMutation({ conversationId: id });
-                if (selectedConversationId === id) {
-                    onSelectConversation(null as any);
-                }
-                toast.success("Chat deleted");
-            } catch (err) {
-                console.error("Failed to delete chat:", err);
-                toast.error("Failed to delete chat");
-            }
-        }
+    const handleDeleteChat = async (id: Id<"conversations">, name: string) => {
+        toast(`Delete chat with ${name}?`, {
+            description: "This will remove the chat for you and cannot be undone.",
+            action: {
+                label: "Delete",
+                onClick: async () => {
+                    try {
+                        await deleteConversationMutation({ conversationId: id });
+                        if (selectedConversationId === id) {
+                            onSelectConversation(null as any);
+                        }
+                        toast.success("Chat deleted");
+                    } catch (err) {
+                        console.error("Failed to delete chat:", err);
+                        toast.error("Failed to delete chat");
+                    }
+                },
+            },
+        });
     };
 
     const handleUserClick = useCallback(async (userId: Id<"users">) => {
@@ -677,7 +703,7 @@ export const Sidebar = memo(function Sidebar({
                                         <BlockedItem
                                             key={user._id}
                                             user={user}
-                                            onUnblock={() => toggleBlock(user._id)}
+                                            onUnblock={() => toggleBlock(user._id, user.name)}
                                             onPreviewImage={setPreviewImage}
                                         />
                                     ))
@@ -705,11 +731,16 @@ export const Sidebar = memo(function Sidebar({
                                             onTogglePin={() => togglePin(conv._id)}
                                             isPinned={conv.isPinned}
                                             onToggleBlock={() => {
+                                                const other = conv.otherParticipants?.[0];
+                                                const name = conv.isGroup ? conv.groupName : (other?.name || "User");
                                                 const otherId = conv.participantIds.find((id: any) => id !== me?._id);
-                                                if (otherId) toggleBlock(otherId);
+                                                if (otherId) toggleBlock(otherId, name);
                                             }}
                                             isBlocked={blockedUserIds.has(conv.participantIds.find((id: any) => id !== me?._id))}
-                                            onDelete={() => handleDeleteChat(conv._id)}
+                                            onDelete={() => {
+                                                const name = conv.isGroup ? conv.groupName : (conv.otherParticipants?.[0]?.name || "User");
+                                                handleDeleteChat(conv._id, name);
+                                            }}
                                             me={me}
                                         />
                                     ))
