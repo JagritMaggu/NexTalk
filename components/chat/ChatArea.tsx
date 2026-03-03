@@ -467,7 +467,7 @@ const ActiveChat = memo(function ActiveChat({
             </div>
 
             <div className="flex-1 bg-white rounded-t-[40px] md:rounded-none flex flex-col overflow-hidden">
-                {/* Pinned Messages Bar - stays sticky above scroll, like WhatsApp */}
+                {/* Pinned Messages Bar - stays sticky above scroll */}
                 {pinnedMessages && pinnedMessages.length > 0 && (
                     <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 px-5 py-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                         <Pin className="w-4 h-4 text-[#FEF9C3] fill-current flex-shrink-0" />
@@ -480,8 +480,16 @@ const ActiveChat = memo(function ActiveChat({
                             onClick={() => {
                                 const el = document.getElementById(pinnedMessages[0]._id);
                                 el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                el?.classList.add('ring-4', 'ring-yellow-400/30', 'rounded-2xl');
-                                setTimeout(() => el?.classList.remove('ring-4', 'ring-yellow-400/30'), 2000);
+                                if (el) {
+                                    el.style.transition = 'background-color 0.15s ease';
+                                    el.style.backgroundColor = 'rgba(254, 249, 195, 0.45)';
+                                    el.style.borderRadius = '20px';
+                                    setTimeout(() => {
+                                        el.style.transition = 'background-color 0.7s ease';
+                                        el.style.backgroundColor = 'transparent';
+                                        setTimeout(() => { el.style.cssText = ''; }, 800);
+                                    }, 700);
+                                }
                             }}
                             className="text-[9px] font-black text-[#FEF9C3] uppercase tracking-widest hover:text-yellow-300 transition-colors flex-shrink-0"
                         >
@@ -916,8 +924,16 @@ const MessageItem = memo(({
                         onClick={() => {
                             const el = document.getElementById(msg.parentMessage.id);
                             el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            el?.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
-                            setTimeout(() => el?.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
+                            if (el) {
+                                el.style.transition = 'background-color 0.15s ease';
+                                el.style.backgroundColor = 'rgba(254, 249, 195, 0.45)';
+                                el.style.borderRadius = '20px';
+                                setTimeout(() => {
+                                    el.style.transition = 'background-color 0.7s ease';
+                                    el.style.backgroundColor = 'transparent';
+                                    setTimeout(() => { el.style.cssText = ''; }, 800);
+                                }, 700);
+                            }
                         }}
                         className={`-mx-4.5 -mt-2.5 mb-2.5 bg-zinc-800 border-b border-white/5 cursor-pointer transition-all hover:opacity-90 flex items-stretch overflow-hidden rounded-t-[inherit]`}
                     >
