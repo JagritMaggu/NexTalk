@@ -497,7 +497,7 @@ const ActiveChat = memo(function ActiveChat({
                         <div className="flex-shrink-0 bg-[#0b141b] border-b border-white/10 flex items-stretch animate-in fade-in slide-in-from-top-2 duration-300 h-[60px] group/pinned">
                             {/* Progress indicator / Index Button */}
                             <div
-                                className="flex flex-col gap-[3px] justify-center px-4 md:px-5 self-stretch border-r border-white/5 flex-shrink-0 bg-white/[0.02]"
+                                className="flex flex-col gap-[3px] justify-center px-4 md:px-5 self-stretch flex-shrink-0 bg-[#0b141b]"
                             >
                                 {Array.from({ length: Math.min(total, 10) }).map((_, i) => (
                                     <button
